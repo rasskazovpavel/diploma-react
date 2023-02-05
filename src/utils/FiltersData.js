@@ -3,6 +3,7 @@ export const filtersData = [
     name: "Высоты",
     options: [{ unit: "GEO" }, { unit: "MEO" }, { unit: "LEO" }],
     type: "checkbox",
+    id: "UNApogee",
   },
   {
     name: "Назначения",

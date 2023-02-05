@@ -1,25 +1,26 @@
-import * as SATS from "../utils/data.json";
+export const PickData = (SATS, currFilter, chosenData, limit = 0) => {
+  // проходим по всей таблице и считаем повторяющиеся значения
+  let countKeysObj = {};
 
-export const PickData = (category, values, limit = 0) => {
-  let categoryTypes = {};
-
-  for (const [key, value] of Object.entries(SATS.default)) {
-    const categoryType = value[category].split(" ")[0];
-    if (!values || values.includes(categoryType)) {
-      if (categoryType && Object.keys(categoryTypes).includes(categoryType))
-        categoryTypes[categoryType] += 1;
-      else categoryTypes[categoryType] = 1;
+  for (const [key, lineTable] of Object.entries(SATS.default)) {
+    const currValue = lineTable[currFilter].split(" ")[0];
+    if (!chosenData || chosenData.includes(currValue)) {
+      if (currValue && Object.keys(countKeysObj).includes(currValue))
+        // если такое значение было, прибавляем
+        countKeysObj[currValue] += 1;
+      // иначе создаём новое поле
+      else countKeysObj[currValue] = 1;
     }
   }
 
-  let filteredCategoryTypes = {};
-  for (const key in categoryTypes) {
-    if (categoryTypes[key] >= limit) {
-      filteredCategoryTypes[key] = categoryTypes[key];
+  let filteredCountKeysObj = {};
+  for (const key in countKeysObj) {
+    if (countKeysObj[key] >= limit) {
+      filteredCountKeysObj[key] = countKeysObj[key];
     }
   }
 
-  const categoryTypeKeys = Object.keys(filteredCategoryTypes);
-  const categoryTypeValues = Object.values(filteredCategoryTypes);
+  const categoryTypeKeys = Object.keys(filteredCountKeysObj);
+  const categoryTypeValues = Object.values(filteredCountKeysObj);
   return [categoryTypeKeys, categoryTypeValues];
 };

@@ -6,20 +6,31 @@ import FiltersCheckBox from "./FiltersCheckBox";
 import FiltersCheckBoxScroll from "./FiltersCheckBoxScroll";
 import FiltersSlider from "./FiltersSlider";
 
-function FiltersMenu({ chosenData, setChosenData, setCurrFilter }) {
+function FiltersMenu({ setChosenData, setCurrFilter, currFilter, SATS }) {
   return (
     <div className="filters_menu">
       {filtersData.map((line, i) => {
+        console.log(i);
         if (line.type === "checkbox") {
-          return FiltersCheckBox(line, i, setChosenData);
+          return (
+            <FiltersCheckBox
+              filtersDataItem={line}
+              setChosenData={setChosenData}
+              setCurrFilter={setCurrFilter}
+              key={i}
+            />
+          );
         }
         if (line.type === "checkbox-scroll")
-          return FiltersCheckBoxScroll(
-            line,
-            i,
-            chosenData,
-            setChosenData,
-            setCurrFilter
+          return (
+            <FiltersCheckBoxScroll
+              filtersDataItem={line}
+              setChosenData={setChosenData}
+              setCurrFilter={setCurrFilter}
+              currFilter={currFilter}
+              SATS={SATS}
+              key={i}
+            />
           );
         // if (line.type === "slider") return FiltersSlider(line);
       })}

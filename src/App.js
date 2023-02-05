@@ -5,6 +5,7 @@ import PieChart from "./components/PieChart";
 import BarChart from "./components/BarChart";
 import LineChart from "./components/LineChart";
 import FiltersMenu from "./components/FiltersMenu";
+import * as SATS from "./utils/data.json";
 // import "./styles.css";
 import {
   Chart,
@@ -15,7 +16,7 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
-import useEnhancedEffect from "@mui/material/utils/useEnhancedEffect";
+import { PrepareData } from "./utils/PrepareData";
 Chart.register(CategoryScale);
 Chart.register(ArcElement);
 Chart.register(CategoryScale);
@@ -24,15 +25,16 @@ Chart.register(BarElement);
 Chart.register(PointElement);
 Chart.register(LineElement);
 
+// переводим численные высоты в GEO, MEO, LEO
+const idToParse = ["UNApogee"];
+const SATSParsed = PrepareData(SATS, idToParse);
+console.log(SATSParsed);
+
 export default function App() {
-  const [chosenData, setChosenData] = useState([]);
-  const [currFilter, setCurrFilter] = useState([]);
-  const [labels, setLabels] = useState([]);
-  const [values, setValues] = useState([]);
-  // let [keys, values] = [];
-  // if (chosenData) [keys, values] = PickData("UNState", chosenData[1]);
-  // console.log(chosenData);
-  // console.log(keys, values);
+  const [chosenData, setChosenData] = useState([]); // выбранные чекбоксы
+  const [currFilter, setCurrFilter] = useState([]); // текущий фильтр (назначение, страна, высота)
+  const [labels, setLabels] = useState([]); // выбранные ключи
+  const [values, setValues] = useState([]); // выбранные значения
 
   const chartData = {
     labels: labels,
@@ -46,59 +48,28 @@ export default function App() {
       },
     ],
   };
-  // const [chartData, setChartData] = useState({
-  //   labels: [],
-  //   datasets: [
-  //     {
-  //       label: "Количество запусков ",
-  //       data: values,
-  //       backgroundColor: ["rgba(75,192,192,1)"],
-  //       borderColor: "black",
-  //       borderWidth: 2,
-  //     },
-  //   ],
-  // });
 
-  console.log(chartData);
-
-  const collectChosenData = async (data) => {
-    console.log(currFilter);
-    let [keys, nums] = PickData(currFilter, chosenData);
-    console.log(keys, values);
+  // собираем данные по выбранным чекбоксам в базе
+  const collectChosenData = async () => {
+    let [keys, nums] = PickData(SATSParsed, currFilter, chosenData);
     setLabels(keys);
     setValues(nums);
-    console.log(labels);
-    console.log(typeof values[0]);
   };
 
-  const updateChartData = async (keys, values) => {
-    // console.log(keys, values);
-    // let updChartData = chartData;
-    // updChartData.labels = [...keys];
-    // updChartData.datasets[0].data = [...values];
-    // setChartData(updChartData);
-  };
-
+  // вызываем сбор данных в конце
   useEffect(() => {
+    console.log(chosenData);
     collectChosenData();
   }, [chosenData]);
 
   return (
     <div className="App">
       <FiltersMenu
-        chosenData={chosenData}
         setChosenData={setChosenData}
         setCurrFilter={setCurrFilter}
+        currFilter={currFilter}
+        SATS={SATSParsed}
       />
-      <p>
-        <button
-          id="btn"
-          className="btn btn-sm btn-outline-primary"
-          onClick={() => updateChartData(labels, values)}
-        >
-          Применить
-        </button>
-      </p>
       <div className="main">
         {/* <PieChart chartData={chartData} /> */}
         <BarChart chartData={chartData} />
