@@ -1,48 +1,32 @@
 import React, { useEffect, useState } from "react";
 const FiltersCheckBox = (dataCategory) => {
-  const [data, setData] = useState({
-    name: dataCategory.name,
-    options: dataCategory.options,
-  });
-  const [isParentChecked, setIsParentChecked] = useState(false);
-  // useEffect(() => console.log(data));
-  const changeCheckboxStatus = (e, id) => {
-    const myData = [data.name, ...data.options];
-    const { checked } = e.target;
-    myData.map((dataUnit) => {
-      if (id === data.name) {
-        setIsParentChecked(checked);
-        myData.isChecked = checked;
-        for (const option in myData) {
-          if (typeof myData[option] === "object")
-            myData[option].isChecked = checked;
-        }
-      } else {
-        data.options.forEach((optionsElement) => {
-          if (optionsElement.unit === id) {
-            optionsElement.isChecked = checked;
-          }
-        });
-        const isAllChildsChecked = data.options.every(
-          (dataUnit) => dataUnit.isChecked === true
-        );
-        if (isAllChildsChecked) {
-          setIsParentChecked(checked);
-          myData.isChecked = true;
-        } else {
-          setIsParentChecked(false);
-          myData.isChecked = false;
-        }
-      }
-      return dataUnit;
-    });
-    const [nameUnit, ...optionsUnit] = myData;
-    setData({
-      name: nameUnit,
-      options: optionsUnit,
-      isChecked: myData.isChecked,
-    });
+  const [data, setData] = useState(dataCategory.options);
+  const [parentChecked, setParentChecked] = useState(false);
+
+  const changeCheckboxStatus = (i) => {
+    setData(
+      data.map((line, order) =>
+        order === i
+          ? { unit: data[i].unit, isChecked: !data[i].isChecked }
+          : line
+      )
+    );
   };
+
+  const changeParentCheckbox = (e) => {
+    setParentChecked(e.currentTarget.checked);
+    setData(
+      data.map((line, order) => {
+        return { unit: data[order].unit, isChecked: e.currentTarget.checked };
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (data.every((line) => line.isChecked === true)) {
+      setParentChecked(true);
+    } else setParentChecked(false);
+  }, [data]);
 
   return (
     <ul>
@@ -50,27 +34,25 @@ const FiltersCheckBox = (dataCategory) => {
         <input
           type="checkbox"
           value="parent"
-          onChange={(e) => changeCheckboxStatus(e, data.name)}
-          checked={isParentChecked}
+          onChange={(e) => changeParentCheckbox(e)}
+          checked={parentChecked}
         />
-        {data.name}
+        {dataCategory.name}
       </li>
       <ul>
-        {data &&
-          data.options &&
-          data.options.map((dataUnit, i) => {
-            return (
-              <li key={i}>
-                <input
-                  type="checkbox"
-                  checked={dataUnit.isChecked}
-                  value="child"
-                  onChange={(e) => changeCheckboxStatus(e, dataUnit.unit)}
-                />
-                {dataUnit.unit}
-              </li>
-            );
-          })}
+        {data.map((line, i) => {
+          return (
+            <li>
+              <input
+                type="checkbox"
+                value="child"
+                onChange={() => changeCheckboxStatus(i)}
+                checked={line.isChecked}
+              />
+              {line.unit}
+            </li>
+          );
+        })}
       </ul>
     </ul>
   );
