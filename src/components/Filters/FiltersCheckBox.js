@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 const FiltersCheckBox = ({ filtersDataItem, setChosenData, setCurrFilter }) => {
   // достаём данные из FiltersMenu
-  console.log(filtersDataItem);
   const [data, setData] = useState(filtersDataItem.options);
   const [parentChecked, setParentChecked] = useState(false);
 

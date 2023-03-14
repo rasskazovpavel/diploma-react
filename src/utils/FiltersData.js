@@ -1,17 +1,23 @@
 export const filtersData = [
+  // {
+  //   name: "Высоты",
+  //   options: [{ unit: "GEO" }, { unit: "MEO" }, { unit: "LEO" }],
+  //   type: "checkbox",
+  //   id: "UNApogee",
+  // },
+  // {
+  //   name: "Назначения",
+  //   options: [],
+  //   type: "checkbox-scroll",
+  //   id: "Category",
+  // },
   {
-    name: "Высоты",
-    options: [{ unit: "GEO" }, { unit: "MEO" }, { unit: "LEO" }],
-    type: "checkbox",
-    id: "UNApogee",
-  },
-  {
-    name: "Назначения",
+    name: "Дата запуска",
     options: [],
     type: "checkbox-scroll",
-    id: "Category",
+    id: "date_launch",
   },
-  { name: "Страны", options: [], type: "checkbox-scroll", id: "UNState" },
+  { name: "Страны", options: [], type: "checkbox-scroll", id: "country_op" },
   // {
   //   name: "Площадки запуска",
   //   options: [],

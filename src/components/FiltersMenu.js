@@ -2,15 +2,20 @@ import "./style.css";
 import { useState, useEffect } from "react";
 
 import { filtersData } from "../utils/FiltersData";
-import FiltersCheckBox from "./FiltersCheckBox";
-import FiltersCheckBoxScroll from "./FiltersCheckBoxScroll";
-import FiltersSlider from "./FiltersSlider";
+import FiltersCheckBox from "./Filters/FiltersCheckBox";
+import FiltersCheckBoxScroll from "./Filters/FiltersCheckBoxScroll";
+import FiltersSlider from "./Filters/FiltersSlider";
 
-function FiltersMenu({ setChosenData, setCurrFilter, currFilter, SATS }) {
+function FiltersMenu({
+  setChosenData,
+  setCurrFilter,
+  currFilter,
+  allData,
+  chosenData,
+}) {
   return (
     <div className="filters_menu">
       {filtersData.map((line, i) => {
-        console.log(i);
         if (line.type === "checkbox") {
           return (
             <FiltersCheckBox
@@ -26,10 +31,11 @@ function FiltersMenu({ setChosenData, setCurrFilter, currFilter, SATS }) {
             <FiltersCheckBoxScroll
               filtersDataItem={line}
               setChosenData={setChosenData}
+              chosenData={chosenData}
               setCurrFilter={setCurrFilter}
               currFilter={currFilter}
-              SATS={SATS}
               key={i}
+              allData={allData}
             />
           );
         // if (line.type === "slider") return FiltersSlider(line);

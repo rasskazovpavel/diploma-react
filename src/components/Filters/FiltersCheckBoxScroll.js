@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from "react";
 import ReactIScroll from "react-iscroll";
 import iScroll from "iscroll";
-import { PickData } from "../utils/PickData";
+import { PickData } from "../../utils/PickData";
 
 const FiltersCheckBoxScroll = ({
   filtersDataItem,
   setChosenData,
   setCurrFilter,
+  chosenData,
   currFilter,
-  SATS,
+  allData,
 }) => {
   // отбираем из таблицы данные по нужной категории
   const [data, setData] = useState(
-    PickData(SATS, filtersDataItem.id)[0].map((item) => {
+    Object.keys(PickData(allData, filtersDataItem.id)).map((item) => {
       return { unit: item };
     })
   );
-  const [prevFilter, setPrevFilter] = useState();
 
   const [parentChecked, setParentChecked] = useState(false);
 
   // обновляем выбранные данные
   const updateChosenData = (currData, i) => {
     // обновляем текущий фильтр в App.js
-    setPrevFilter(currFilter);
     setCurrFilter(filtersDataItem.id);
     // если все фильтры категории выбраны, то родительский тоже
     if (currData.every((line) => line.isChecked === true)) {
@@ -36,7 +35,9 @@ const FiltersCheckBoxScroll = ({
       }
       return acc;
     }, []);
-    setChosenData(selectedData);
+    const newData = Object.assign({}, chosenData);
+    newData[filtersDataItem.id] = selectedData;
+    setChosenData(newData);
   };
 
   // обновляем фильтры категории
@@ -58,18 +59,6 @@ const FiltersCheckBoxScroll = ({
     updateChosenData(currData);
     setData(currData);
   };
-
-  // useEffect(() => {
-  //   console.log(currFilter, filtersDataItem.id, prevFilter);
-  //   if (prevFilter !== filtersDataItem.id) {
-  //     setParentChecked(false);
-  //     const currData = data.map((line, order) => {
-  //       return { unit: data[order].unit, isChecked: false };
-  //     });
-  //     updateChosenData(currData);
-  //     setData(currData);
-  //   }
-  // }, [data]);
 
   return (
     <ul>
