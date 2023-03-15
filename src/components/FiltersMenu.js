@@ -4,17 +4,21 @@ import { useState, useEffect } from "react";
 import { filtersData } from "../utils/FiltersData";
 import FiltersCheckBox from "./Filters/FiltersCheckBox";
 import FiltersCheckBoxScroll from "./Filters/FiltersCheckBoxScroll";
+import FiltersAxes from "./Filters/FiltersAxes";
 import FiltersSlider from "./Filters/FiltersSlider";
 
-function FiltersMenu({
+const FiltersMenu = ({
   setChosenData,
   setCurrFilter,
   currFilter,
   allData,
   chosenData,
-}) {
+  axes,
+  setAxes,
+}) => {
   return (
     <div className="filters_menu">
+      <FiltersAxes axes={axes} setAxes={setAxes} />
       {filtersData.map((line, i) => {
         if (line.type === "checkbox") {
           return (
@@ -42,5 +46,5 @@ function FiltersMenu({
       })}
     </div>
   );
-}
+};
 export default FiltersMenu;

@@ -60,43 +60,55 @@ const FiltersCheckBoxScroll = ({
     setData(currData);
   };
 
+  const clearCheckboxes = () => {
+    setParentChecked(false);
+    const currData = data.map((line, order) => {
+      return { unit: data[order].unit, isChecked: false };
+    });
+    updateChosenData(currData);
+    setData(currData);
+  };
+
   return (
-    <ul>
-      <li>
-        <input
-          type="checkbox"
-          value="parent"
-          onChange={(e) => changeParentCheckbox(e)}
-          checked={parentChecked}
-        />
-        {filtersDataItem.name}
-      </li>
-      <ReactIScroll
-        className="filters_menu__scroll_wrapper"
-        iScroll={iScroll}
-        options={{
-          mouseWheel: true,
-          scrollbars: true,
-          interactiveScrollbars: true,
-        }}
-      >
-        <ul>
-          {data.map((line, i) => {
-            return (
-              <li key={i}>
-                <input
-                  type="checkbox"
-                  value="child"
-                  onChange={() => changeCheckboxStatus(i)}
-                  checked={line.isChecked}
-                />
-                {line.unit}
-              </li>
-            );
-          })}
-        </ul>
-      </ReactIScroll>
-    </ul>
+    <>
+      <ul>
+        <li>
+          <input
+            type="checkbox"
+            value="parent"
+            onChange={(e) => changeParentCheckbox(e)}
+            checked={parentChecked}
+          />
+          {filtersDataItem.name}
+        </li>
+        <ReactIScroll
+          className="filters_menu__scroll_wrapper"
+          iScroll={iScroll}
+          options={{
+            mouseWheel: true,
+            scrollbars: true,
+            interactiveScrollbars: true,
+          }}
+        >
+          <ul>
+            {data.map((line, i) => {
+              return (
+                <li key={i}>
+                  <input
+                    type="checkbox"
+                    value="child"
+                    onChange={() => changeCheckboxStatus(i)}
+                    checked={line.isChecked}
+                  />
+                  {line.unit}
+                </li>
+              );
+            })}
+          </ul>
+        </ReactIScroll>
+      </ul>
+      <button onClick={clearCheckboxes}>Очистить</button>
+    </>
   );
 };
 export default FiltersCheckBoxScroll;
