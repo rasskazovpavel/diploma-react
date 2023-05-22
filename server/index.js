@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3001;
 
-const merchant_model = require("./merchant_model");
+const data_model = require("./data_model");
 
 app.use(express.json());
 app.use(function (req, res, next) {
@@ -15,9 +15,21 @@ app.use(function (req, res, next) {
   next();
 });
 
+// app.get("/", (req, res) => {
+//   data_model
+//     .getData()
+//     .then((response) => {
+//       res.status(200).send(response);
+//     })
+//     .catch((error) => {
+//       res.status(500).send(error);
+//     });
+// });
+
 app.get("/", (req, res) => {
-  merchant_model
-    .getMerchants()
+  console.log(req.query);
+  data_model
+    .PickDataNew(req.query.cat, req.query.val)
     .then((response) => {
       res.status(200).send(response);
     })
