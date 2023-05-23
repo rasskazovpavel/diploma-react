@@ -78,6 +78,7 @@ export default function Analysis() {
   const [chosenData, setChosenData] = useState({}); // выбранные чекбоксы
   const [currFilter, setCurrFilter] = useState([]); // текущий фильтр (назначение, страна, высота)
   const [typeGraph, setTypeGraph] = useState();
+  const [chosenGraphs, setChosenGraphs] = useState([]);
 
   // текущие главная ось (абсцисса) и побочная (ордината)
   const [axes, setAxes] = useState({
@@ -152,8 +153,7 @@ export default function Analysis() {
     // если выбрали чекбокс главной оси
     if (axes[currFilter] && currFilter === axes[currFilter].x) {
       const typeGraph = axes[currFilter].chart;
-      console.log(typeGraph);
-      console.log("дошёл");
+
       if (typeGraph === "barchart" || typeGraph === "linechart") {
         if (chosenData[axes.y]) {
           // handleStackedGraphs();
@@ -180,50 +180,73 @@ export default function Analysis() {
           // });
           console.log(axes[currFilter].x);
           console.log(chosenData);
-          const singleAxis = chosenData[axes[currFilter].x].map((elem) => {
-            console.log(elem);
-            return PickDataDB(axes[currFilter].x, elem).then((allData) => {
-              return allData;
+          if (chosenData[currFilter]) {
+            const singleAxis = chosenData[axes[currFilter].x].map((elem) => {
+              console.log(elem);
+              return PickDataDB(axes[currFilter].x, elem).then((allData) => {
+                return allData;
+              });
             });
-          });
-          Promise.all(singleAxis).then((singleAxis) => {
-            console.log(singleAxis);
-            const singleAxisData = {};
-            singleAxis.map((elem) => {
-              if (colors[Object.keys(elem)[0]])
-                singleAxisData[Object.keys(elem)[0]] = [
-                  Object.values(elem)[0],
-                  colors[Object.keys(elem)[0]],
-                ];
-              else {
-                let bgColor = randColor();
-                let newColors = { ...colors, [Object.keys(elem)[0]]: bgColor };
-                setColors(newColors);
-                singleAxisData[Object.keys(elem)[0]] = [
-                  Object.values(elem)[0],
-                  bgColor,
-                ];
-              }
+            Promise.all(singleAxis).then((singleAxis) => {
+              console.log(singleAxis);
+              const singleAxisData = {};
+              singleAxis.map((elem) => {
+                if (colors[Object.keys(elem)[0]])
+                  singleAxisData[Object.keys(elem)[0]] = [
+                    Object.values(elem)[0],
+                    colors[Object.keys(elem)[0]],
+                  ];
+                else {
+                  let bgColor = randColor();
+                  let newColors = {
+                    ...colors,
+                    [Object.keys(elem)[0]]: bgColor,
+                  };
+                  setColors(newColors);
+                  singleAxisData[Object.keys(elem)[0]] = [
+                    Object.values(elem)[0],
+                    bgColor,
+                  ];
+                }
+              });
+              const values = Object.values(singleAxisData).map(
+                (pair) => pair[0]
+              );
+              const colorsChart = Object.values(singleAxisData).map(
+                (pair) => pair[1]
+              );
+              const newChartData = Object.assign({}, chartData);
+              console.log(newChartData);
+              newChartData[currFilter] = {
+                labels: Object.keys(singleAxisData),
+                datasets: [
+                  {
+                    label: "Количество запусков",
+                    data: values,
+                    backgroundColor: colorsChart,
+                    borderWidth: 2,
+                  },
+                ],
+              };
+              console.log(newChartData);
+              setChartData(newChartData);
             });
-            const values = Object.values(singleAxisData).map((pair) => pair[0]);
-            const colorsChart = Object.values(singleAxisData).map(
-              (pair) => pair[1]
-            );
+          } else {
             const newChartData = Object.assign({}, chartData);
-            console.log(newChartData);
             newChartData[currFilter] = {
-              labels: Object.keys(singleAxisData),
+              labels: [],
               datasets: [
                 {
                   label: "Количество запусков",
-                  data: values,
-                  backgroundColor: colorsChart,
+                  data: [],
+                  backgroundColor: [],
                   borderWidth: 2,
                 },
               ],
             };
+            console.log(newChartData);
             setChartData(newChartData);
-          });
+          }
         }
       }
       if (typeGraph === "piechart") {
@@ -297,13 +320,16 @@ export default function Analysis() {
         setTypeGraph={setTypeGraph}
         typeGraph={typeGraph}
         setChartData={setChartData}
+        chosenGraphs={chosenGraphs}
+        setChosenGraphs={setChosenGraphs}
       />
       {/* )} */}
       <div className="analysis__graphs">
         {Object.keys(chosenData).map((graph) => {
+          console.log(graph, chosenData);
           const typeGraph = axes[graph].chart;
           console.log(chosenData, chartData);
-          if (chartData[graph]) {
+          if (chartData[graph].labels.length > 0) {
             if (typeGraph === "piechart")
               return (
                 <PieChart

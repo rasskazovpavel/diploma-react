@@ -10,38 +10,72 @@ const FiltersCheckBoxScroll = ({
   setCurrFilter,
   chosenData,
   currFilter,
-  allData,
+  graphId,
+  chartData,
+  setChartData,
+  chosenGraphs,
+  setChosenGraphs,
 }) => {
   // отбираем из таблицы данные по нужной категории
-  console.log(chosenData);
-  console.log(filtersDataItem.id);
+  const [listOpen, setListOpen] = useState(false);
   const [data, setData] = useState();
-  const [renderedData, setRenderedData] = useState();
+  const [renderedData, setRenderedData] = useState([]);
   const [inputQuery, setInputQuery] = useState("");
-  const inputRef = useRef();
+
   // const [data, setData] = useState(
   //   Object.keys(PickData(allData, filtersDataItem.id)).map((item) => {
   //     return { unit: item };
   //   })
   // );
 
-  const [parentChecked, setParentChecked] = useState(false);
+  // const [parentChecked, setParentChecked] = useState(false);
+
+  const chooseCategory = (e) => {
+    let newChosenGraphs = [...chosenGraphs];
+    if (chosenGraphs.includes(graphId)) {
+      const index = chosenGraphs.indexOf(graphId);
+      if (index !== -1) {
+        console.log(index, chosenGraphs, newChosenGraphs);
+        newChosenGraphs.splice(index, 1);
+        const currData = data.map((line) => {
+          return { unit: line.unit, isChecked: false, value: line.value };
+        });
+        const newData = [...currData];
+        filterList(inputQuery, newData);
+        setData(newData);
+        const newChosenData = Object.assign({}, chosenData);
+        newChosenData[graphId] = [];
+        setChosenData(newChosenData);
+        setListOpen(false);
+      }
+    } else {
+      newChosenGraphs.push(graphId);
+    }
+    console.log(newChosenGraphs, graphId);
+    setChosenGraphs(newChosenGraphs);
+    setCurrFilter(filtersDataItem.id);
+  };
+
+  const openDropdown = () => {
+    if (chosenGraphs.includes(graphId)) {
+      setListOpen(!listOpen);
+    }
+  };
 
   const filterList = (value, currData) => {
-    console.log(value);
-    if (value) {
+    if (value !== "") {
       let filteredData = currData.filter((line) => {
-        console.log(line.unit, value);
         return line.unit.toLowerCase().includes(value.toLowerCase());
       });
       const newData = [...filteredData];
-      console.log(newData);
       setRenderedData(newData);
-    } else setRenderedData(data);
+      console.log(newData);
+    } else {
+      setRenderedData(currData);
+    }
   };
 
   const inputHandler = (e) => {
-    console.log(e.target.value);
     setInputQuery(e.target.value);
     filterList(e.target.value, data);
   };
@@ -60,7 +94,6 @@ const FiltersCheckBoxScroll = ({
       }
       return acc;
     }, []);
-    console.log(currData);
     const newData = { ...chosenData, [filtersDataItem.id]: selectedData };
     // newData[filtersDataItem.id] = selectedData;
     setChosenData(newData);
@@ -69,41 +102,40 @@ const FiltersCheckBoxScroll = ({
 
   // обновляем фильтры категории
   const changeCheckboxStatus = (e) => {
-    console.log(e.target);
     const currData = data.map((line) =>
       line.unit === e.target.value
         ? {
             unit: line.unit,
-            isChecked: e.target.checked,
+            isChecked: !line.isChecked,
             value: line.value,
           }
         : line
     );
-    console.log("currData", currData);
     updateChosenData(currData);
     // filterList(inputQuery);
-    setData(currData);
-    filterList(inputQuery, currData);
+    const newData = [...currData];
+    setData(newData);
+    filterList(inputQuery, newData);
   };
 
   // обновляем родительский чекбокс
-  const changeParentCheckbox = (e) => {
-    setParentChecked(e.currentTarget.checked);
-    const currData = data.map((line, order) => {
-      return { unit: data[order].unit, isChecked: e.currentTarget.checked };
-    });
-    updateChosenData(currData);
-    setData(currData);
-  };
+  // const changeParentCheckbox = (e) => {
+  //   setParentChecked(e.currentTarget.checked);
+  //   const currData = data.map((line, order) => {
+  //     return { unit: data[order].unit, isChecked: e.currentTarget.checked };
+  //   });
+  //   updateChosenData(currData);
+  //   setData(currData);
+  // };
 
-  const clearCheckboxes = () => {
-    setParentChecked(false);
-    const currData = data.map((line, order) => {
-      return { unit: data[order].unit, isChecked: false };
-    });
-    updateChosenData(currData);
-    setData(currData);
-  };
+  // const clearCheckboxes = () => {
+  //   setParentChecked(false);
+  //   const currData = data.map((line, order) => {
+  //     return { unit: data[order].unit, isChecked: false };
+  //   });
+  //   updateChosenData(currData);
+  //   setData(currData);
+  // };
 
   useEffect(() => {
     PickDataDB(filtersDataItem.id, "")
@@ -112,61 +144,69 @@ const FiltersCheckBoxScroll = ({
         const newData = keys.map((key) => {
           return { unit: key, value: allData[key] };
         });
-        console.log(newData);
         return newData;
       })
       .then((allData) => {
         setData(allData);
         setRenderedData(allData);
       });
-  }, []);
+  }, [filtersDataItem.id]);
 
+  console.log(chosenGraphs.includes(graphId));
   return (
     <>
       <ul>
         <li>
           <input
             type="checkbox"
-            value="parent"
-            onChange={(e) => changeParentCheckbox(e)}
-            checked={parentChecked}
+            value={currFilter}
+            onChange={(e) => chooseCategory(e)}
           />
           {filtersDataItem.name}
         </li>
-        <input
-          type="text"
-          className="filters_menu__scroll_filter"
-          placeholder="Введите название"
-          onInput={inputHandler}
-          ref={inputRef}
-        />
-        {/* <InputText inputHandler={inputHandler} /> */}
-        <ReactIScroll
-          className="filters_menu__scroll_wrapper"
-          iScroll={iScroll}
-          options={{
-            mouseWheel: true,
-            scrollbars: true,
-            interactiveScrollbars: true,
-          }}
-        >
-          <ul>
-            {renderedData &&
-              renderedData.map((line, i) => {
-                return (
-                  <li key={line.unit}>
-                    <input
-                      type="checkbox"
-                      value={line.unit}
-                      onChange={(e) => changeCheckboxStatus(e)}
-                      checked={line.isChecked}
-                    />
-                    {line.unit}
-                  </li>
-                );
-              })}
-          </ul>
-        </ReactIScroll>
+        {chosenGraphs.includes(graphId) && (
+          <p className="scroll_dropdown" onClick={openDropdown}>
+            Выбор имени
+          </p>
+        )}
+        {listOpen && chosenGraphs.includes(graphId) && (
+          <>
+            <input
+              type="text"
+              className="filters_menu__scroll_filter"
+              placeholder="Введите название"
+              onInput={inputHandler}
+            />
+            {/* <InputText inputHandler={inputHandler} /> */}
+            {renderedData.length > 0 && (
+              <ReactIScroll
+                className="filters_menu__scroll_wrapper"
+                iScroll={iScroll}
+                options={{
+                  mouseWheel: true,
+                  scrollbars: true,
+                  interactiveScrollbars: true,
+                }}
+              >
+                <ul>
+                  {renderedData.map((line, i) => {
+                    return (
+                      <li key={line.unit}>
+                        <input
+                          type="checkbox"
+                          value={line.unit}
+                          onChange={(e) => changeCheckboxStatus(e)}
+                          checked={line.isChecked}
+                        />
+                        {line.unit}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </ReactIScroll>
+            )}
+          </>
+        )}
       </ul>
       {/* <button onClick={clearCheckboxes}>Очистить</button> */}
     </>

@@ -24,6 +24,9 @@ const FiltersMenu = ({
   setTypeGraph,
   typeGraph,
   setChartData,
+  chartData,
+  setChosenGraphs,
+  chosenGraphs,
 }) => {
   const div2PDF = (e) => {
     const but = e.target;
@@ -49,6 +52,7 @@ const FiltersMenu = ({
   };
   return (
     <div className="filters_menu">
+      <h3>Настройки</h3>
       {console.log("here")}
       {/* <FiltersTypeGraph
         setTypeGraph={setTypeGraph}
@@ -82,6 +86,11 @@ const FiltersMenu = ({
             currFilter={currFilter}
             key={line.id}
             allData={allData}
+            graphId={line.id}
+            setChartData={setChartData}
+            chartData={chartData}
+            chosenGraphs={chosenGraphs}
+            setChosenGraphs={setChosenGraphs}
           />
         );
         // }
