@@ -21,6 +21,15 @@ export const PickDataDB = (category, value) => {
             else acc[val] += 1;
             return acc;
           }, {});
+        } else if (category === "date_launch") {
+          const newDataValues = newData.map(
+            ({ date_launch }) => date_launch.split("-")[0]
+          );
+          newData = newDataValues.reduce((acc, val) => {
+            if (!Object.keys(acc).includes(val)) acc[val] = 1;
+            else acc[val] += 1;
+            return acc;
+          }, {});
         } else {
           const newDataValues = newData.map(
             (categoryObj) => categoryObj[category]

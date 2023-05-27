@@ -19,10 +19,32 @@ const getData = () => {
 };
 
 const PickDataNew = (category, value) => {
-  const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
-  const secondPart = value ? `WHERE ${category} LIKE '${value}%'` : "";
-  const queryLine = `SELECT ${firstPart} FROM tle.satellite_info_all ${secondPart}`;
-  console.log(category, value);
+  let queryLine;
+  const categories = category.split(",");
+  const values = value.split(",");
+  if (categories.length > 1) {
+    let conditions = ``;
+    categories.forEach((cat, index) => {
+      if (cat === "date_launch") {
+        console.log(cat, cat.length);
+        conditions =
+          conditions +
+          `date_launch >= '${values[index]}-01-01' AND date_launch <= '${values[index]}-12-31' AND `;
+      } else conditions = conditions + `${cat} LIKE '${values[index]}%' AND `;
+    });
+    queryLine = `SELECT COUNT(*) FROM tle.satellite_info_all WHERE ${conditions.slice(
+      0,
+      -5
+    )}`;
+  } else {
+    const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
+    const secondPart = value
+      ? category === "date_launch"
+        ? `WHERE date_launch >= '${value}-01-01' AND date_launch <= '${value}-12-31'`
+        : `WHERE ${category} LIKE '${value}%'`
+      : "";
+    queryLine = `SELECT ${firstPart} FROM tle.satellite_info_all ${secondPart}`;
+  }
   console.log(queryLine);
   return new Promise(function (resolve, reject) {
     pool.query(queryLine, (error, results) => {

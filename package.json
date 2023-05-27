@@ -1,5 +1,6 @@
 {
   "name": "diploma-react",
+  "homepage": "https://rasskazovpavel.github.io/diploma-react/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "chart.js": "^4.0.1",
     "chartjs-plugin-datalabels": "^2.1.0",
+    "gh-pages": "^5.0.0",
     "html2canvas": "^1.4.1",
     "iscroll": "^5.2.0",
     "jspdf": "^2.5.1",
@@ -26,6 +28,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

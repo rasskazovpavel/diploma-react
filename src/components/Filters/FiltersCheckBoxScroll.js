@@ -17,10 +17,10 @@ const FiltersCheckBoxScroll = ({
   setChosenGraphs,
 }) => {
   // отбираем из таблицы данные по нужной категории
-  const [listOpen, setListOpen] = useState(false);
-  const [data, setData] = useState();
-  const [renderedData, setRenderedData] = useState([]);
-  const [inputQuery, setInputQuery] = useState("");
+  const [listOpen, setListOpen] = useState({});
+  const [data, setData] = useState({});
+  const [renderedData, setRenderedData] = useState({});
+  const [inputQuery, setInputQuery] = useState({});
 
   // const [data, setData] = useState(
   //   Object.keys(PickData(allData, filtersDataItem.id)).map((item) => {
@@ -32,42 +32,63 @@ const FiltersCheckBoxScroll = ({
 
   const chooseCategory = (e) => {
     let newChosenGraphs = [...chosenGraphs];
-    if (chosenGraphs.includes(graphId)) {
-      const index = chosenGraphs.indexOf(graphId);
+    if (chosenGraphs.includes(filtersDataItem.name)) {
+      const index = chosenGraphs.indexOf(filtersDataItem.name);
       if (index !== -1) {
-        console.log(index, chosenGraphs, newChosenGraphs);
+        console.log(data);
         newChosenGraphs.splice(index, 1);
-        const currData = data.map((line) => {
-          return { unit: line.unit, isChecked: false, value: line.value };
+        const newData = {};
+        Object.entries(data).forEach(([key, val]) => {
+          newData[key] = val.map((el) => {
+            return { unit: el.unit, isChecked: false, value: el.value };
+          });
         });
-        const newData = [...currData];
-        filterList(inputQuery, newData);
+        console.log(newData);
+        // const currData = data.map((line) => {
+        //   return { unit: line.unit, isChecked: false, value: line.value };
+        // });
+        // const newData = [...currData];
+        filterList(inputQuery, newData, null);
         setData(newData);
         const newChosenData = Object.assign({}, chosenData);
-        newChosenData[graphId] = [];
+        console.log(chosenData);
+        Object.keys(chosenData).forEach((key) => {
+          newChosenData[key] = [];
+        });
         setChosenData(newChosenData);
-        setListOpen(false);
+        const newListOpen = Object.assign({}, listOpen);
+        console.log(newListOpen);
+        Object.keys(newListOpen).forEach((key) => (newListOpen[key] = false));
+        setListOpen(newListOpen);
       }
     } else {
-      newChosenGraphs.push(graphId);
+      newChosenGraphs.push(filtersDataItem.name);
     }
     console.log(newChosenGraphs, graphId);
     setChosenGraphs(newChosenGraphs);
-    setCurrFilter(filtersDataItem.id);
+    setCurrFilter([filtersDataItem.name]);
   };
 
-  const openDropdown = () => {
-    if (chosenGraphs.includes(graphId)) {
-      setListOpen(!listOpen);
+  const openDropdown = (e) => {
+    if (chosenGraphs.includes(filtersDataItem.name)) {
+      const newListOpen = Object.assign({}, listOpen);
+      newListOpen[e.target.innerHTML] = !newListOpen[e.target.innerHTML];
+      console.log(newListOpen, e.target.innerHTML);
+      setListOpen(newListOpen);
     }
   };
 
-  const filterList = (value, currData) => {
-    if (value !== "") {
-      let filteredData = currData.filter((line) => {
+  const filterList = (value, currData, axes) => {
+    console.log("тут");
+    // if (axes === null)
+    if (value && axes !== null) {
+      let filteredData = currData[axes].filter((line) => {
+        console.log(line.unit);
         return line.unit.toLowerCase().includes(value.toLowerCase());
       });
-      const newData = [...filteredData];
+      const newData = Object.assign({}, currData);
+      newData[axes] = filteredData;
+      console.log(newData);
       setRenderedData(newData);
       console.log(newData);
     } else {
@@ -75,34 +96,51 @@ const FiltersCheckBoxScroll = ({
     }
   };
 
-  const inputHandler = (e) => {
-    setInputQuery(e.target.value);
-    filterList(e.target.value, data);
+  const inputHandler = (e, axes) => {
+    const newInput = Object.assign({}, inputQuery);
+    newInput[axes] = e.target.value;
+    setInputQuery(newInput);
+    filterList(e.target.value, data, axes);
   };
 
   // обновляем выбранные данные
-  const updateChosenData = (currData) => {
+  const updateChosenData = (currData, axes) => {
     // обновляем текущий фильтр в App.js
     // если все фильтры категории выбраны, то родительский тоже
     // if (currData.every((line) => line.isChecked === true)) {
     //   setParentChecked(true);
     // } else setParentChecked(false);
     // собираем в массивы выбранные фильтры
-    const selectedData = currData.reduce((acc, line) => {
+
+    const selectedData = currData[axes].reduce((acc, line) => {
       if (line.isChecked) {
         acc.push(line.unit);
       }
       return acc;
     }, []);
-    const newData = { ...chosenData, [filtersDataItem.id]: selectedData };
+    // const newData = { ...chosenData, [filtersDataItem.id]: selectedData };
+    console.log(chosenData, filtersDataItem);
+    const newData = Object.assign({}, chosenData);
+    const oldProp = newData[filtersDataItem.name] || {};
+    oldProp[axes] = [...selectedData];
+    newData[filtersDataItem.name] = oldProp;
+    // const newData = {
+    //   ...chosenData,
+    //   [filtersDataItem.name]: {
+    //     ...chosenData[filtersDataItem.id],
+    //     [axes]: [...selectedData],
+    //   },
+    // };
+    console.log(currData);
     // newData[filtersDataItem.id] = selectedData;
     setChosenData(newData);
-    setCurrFilter(filtersDataItem.id);
+    setCurrFilter([filtersDataItem.name, axes]);
   };
 
   // обновляем фильтры категории
-  const changeCheckboxStatus = (e) => {
-    const currData = data.map((line) =>
+  const changeCheckboxStatus = (e, axes) => {
+    console.log(axes);
+    const currData = data[axes].map((line) =>
       line.unit === e.target.value
         ? {
             unit: line.unit,
@@ -111,11 +149,13 @@ const FiltersCheckBoxScroll = ({
           }
         : line
     );
-    updateChosenData(currData);
+    const newData = Object.assign({}, data);
+    newData[axes] = currData;
+    console.log(newData);
+    updateChosenData(newData, axes);
     // filterList(inputQuery);
-    const newData = [...currData];
     setData(newData);
-    filterList(inputQuery, newData);
+    filterList(inputQuery[axes], newData, axes);
   };
 
   // обновляем родительский чекбокс
@@ -138,18 +178,33 @@ const FiltersCheckBoxScroll = ({
   // };
 
   useEffect(() => {
-    PickDataDB(filtersDataItem.id, "")
-      .then((allData) => {
+    // const totalData = {};
+    // const singleAxis = chosenData[axes[currFilter].x].map((elem) => {
+    //   return PickDataDB(axes[currFilter].x, elem).then((allData) => {
+    //     return allData;
+    //   });
+    // });
+    const totalData = Object.values(filtersDataItem.id).map((id) => {
+      console.log(id);
+      return PickDataDB(id, "").then((allData) => {
         const keys = Object.keys(allData);
         const newData = keys.map((key) => {
           return { unit: key, value: allData[key] };
         });
         return newData;
-      })
-      .then((allData) => {
-        setData(allData);
-        setRenderedData(allData);
       });
+    });
+    Promise.all(totalData).then((totalData) => {
+      console.log(totalData);
+      const finalData = {};
+      totalData.forEach((arr, i) => {
+        console.log(filtersDataItem.id);
+        finalData[Object.keys(filtersDataItem.id)[i]] = totalData[i];
+      });
+      console.log(finalData);
+      setData(finalData);
+      setRenderedData(finalData);
+    });
   }, [filtersDataItem.id]);
 
   console.log(chosenGraphs.includes(graphId));
@@ -164,49 +219,56 @@ const FiltersCheckBoxScroll = ({
           />
           {filtersDataItem.name}
         </li>
-        {chosenGraphs.includes(graphId) && (
-          <p className="scroll_dropdown" onClick={openDropdown}>
-            Выбор имени
-          </p>
-        )}
-        {listOpen && chosenGraphs.includes(graphId) && (
-          <>
-            <input
-              type="text"
-              className="filters_menu__scroll_filter"
-              placeholder="Введите название"
-              onInput={inputHandler}
-            />
-            {/* <InputText inputHandler={inputHandler} /> */}
-            {renderedData.length > 0 && (
-              <ReactIScroll
-                className="filters_menu__scroll_wrapper"
-                iScroll={iScroll}
-                options={{
-                  mouseWheel: true,
-                  scrollbars: true,
-                  interactiveScrollbars: true,
-                }}
-              >
-                <ul>
-                  {renderedData.map((line, i) => {
-                    return (
-                      <li key={line.unit}>
-                        <input
-                          type="checkbox"
-                          value={line.unit}
-                          onChange={(e) => changeCheckboxStatus(e)}
-                          checked={line.isChecked}
-                        />
-                        {line.unit}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </ReactIScroll>
-            )}
-          </>
-        )}
+        {chosenGraphs.includes(filtersDataItem.name) &&
+          Object.entries(filtersDataItem.dropdown).map((entry, i) => {
+            return (
+              <div key={i}>
+                <p className="scroll_dropdown" onClick={openDropdown}>
+                  {entry[1]}
+                </p>
+                {listOpen[entry[1]] && (
+                  <>
+                    <input
+                      type="text"
+                      className="filters_menu__scroll_filter"
+                      placeholder="Введите название"
+                      onInput={(e) => inputHandler(e, entry[0])}
+                    />
+                    {/* <InputText inputHandler={inputHandler} /> */}
+                    {renderedData[entry[0]].length > 0 && (
+                      <ReactIScroll
+                        className="filters_menu__scroll_wrapper"
+                        iScroll={iScroll}
+                        options={{
+                          mouseWheel: true,
+                          scrollbars: true,
+                          interactiveScrollbars: true,
+                        }}
+                      >
+                        <ul>
+                          {renderedData[entry[0]].map((line, i) => {
+                            return (
+                              <li key={line.unit}>
+                                <input
+                                  type="checkbox"
+                                  value={line.unit}
+                                  onChange={(e) =>
+                                    changeCheckboxStatus(e, entry[0])
+                                  }
+                                  checked={line.isChecked}
+                                />
+                                {line.unit}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </ReactIScroll>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
       </ul>
       {/* <button onClick={clearCheckboxes}>Очистить</button> */}
     </>

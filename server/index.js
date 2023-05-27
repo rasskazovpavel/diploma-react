@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const app = express();
 const port = 3001;
 
@@ -40,4 +41,12 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
+});
+
+// Have Node serve the files for our built React app
+app.use(express.static(path.resolve(__dirname, "../build")));
+
+// All other GET requests not handled before will return our React app
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../build", "index.html"));
 });

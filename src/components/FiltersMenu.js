@@ -71,7 +71,7 @@ const FiltersMenu = ({
               filtersDataItem={line}
               setChosenData={setChosenData}
               setCurrFilter={setCurrFilter}
-              key={line.id}
+              key={line.id.main}
             />
           );
         }
@@ -84,9 +84,10 @@ const FiltersMenu = ({
             chosenData={chosenData}
             setCurrFilter={setCurrFilter}
             currFilter={currFilter}
-            key={line.id}
+            key={line.id.main}
             allData={allData}
             graphId={line.id}
+            dropdown={line.dropdown}
             setChartData={setChartData}
             chartData={chartData}
             chosenGraphs={chosenGraphs}
