@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/rasskazovpavel/diploma-react/static/css/main.8756df3e.css",
-    "main.js": "/rasskazovpavel/diploma-react/static/js/main.657b0a59.js",
-    "static/js/703.ecd83074.chunk.js": "/rasskazovpavel/diploma-react/static/js/703.ecd83074.chunk.js",
-    "static/js/513.5ae417b2.chunk.js": "/rasskazovpavel/diploma-react/static/js/513.5ae417b2.chunk.js",
-    "index.html": "/rasskazovpavel/diploma-react/index.html",
-    "main.8756df3e.css.map": "/rasskazovpavel/diploma-react/static/css/main.8756df3e.css.map",
-    "main.657b0a59.js.map": "/rasskazovpavel/diploma-react/static/js/main.657b0a59.js.map",
-    "703.ecd83074.chunk.js.map": "/rasskazovpavel/diploma-react/static/js/703.ecd83074.chunk.js.map",
-    "513.5ae417b2.chunk.js.map": "/rasskazovpavel/diploma-react/static/js/513.5ae417b2.chunk.js.map"
+    "main.css": "/diploma-react/static/css/main.8756df3e.css",
+    "main.js": "/diploma-react/static/js/main.e017c94e.js",
+    "static/js/703.ecd83074.chunk.js": "/diploma-react/static/js/703.ecd83074.chunk.js",
+    "static/js/513.5ae417b2.chunk.js": "/diploma-react/static/js/513.5ae417b2.chunk.js",
+    "index.html": "/diploma-react/index.html",
+    "main.8756df3e.css.map": "/diploma-react/static/css/main.8756df3e.css.map",
+    "main.e017c94e.js.map": "/diploma-react/static/js/main.e017c94e.js.map",
+    "703.ecd83074.chunk.js.map": "/diploma-react/static/js/703.ecd83074.chunk.js.map",
+    "513.5ae417b2.chunk.js.map": "/diploma-react/static/js/513.5ae417b2.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.8756df3e.css",
-    "static/js/main.657b0a59.js"
+    "static/js/main.e017c94e.js"
   ]
 }
