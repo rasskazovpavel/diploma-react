@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 
-export const PickDataDB = (category, value) => {
-  console.log(category, value);
+export const PickDataDB = (category, value, current = undefined) => {
+  // console.log(category, value);
   return fetch(`http://localhost:3001?cat=${category}&val=${value}`, {
     category: category,
     value: value,
+    current: current,
   })
     .then((response) => {
       return response.text();
@@ -41,10 +42,6 @@ export const PickDataDB = (category, value) => {
           }, {});
         }
       } else {
-        console.log(newData[0]);
-        // const newDataValues = newData.map((line) => {
-        //   return { [value]: line["count"] };
-        // });
         newData = { [value]: newData[0]["count"] };
       }
       return newData;

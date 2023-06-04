@@ -1,55 +1,30 @@
 {
   "name": "diploma-react",
-  "homepage": "https://rasskazovpavel.github.io/diploma-react/",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@mui/material": "^5.10.15",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "chart.js": "^4.0.1",
-    "chartjs-plugin-datalabels": "^2.1.0",
-    "gh-pages": "^5.0.0",
-    "html2canvas": "^1.4.1",
-    "iscroll": "^5.2.0",
-    "jspdf": "^2.5.1",
-    "pg": "^8.10.0",
-    "react": "^18.2.0",
-    "react-chartjs-2": "^5.0.1",
-    "react-dom": "^18.2.0",
-    "react-iscroll": "^2.0.3",
-    "react-scripts": "5.0.1",
-    "sass": "^1.62.1",
-    "web-vitals": "^2.1.4"
-  },
+  "version": "1.0.0",
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm start",
+    "server": "node index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-  "proxy": "http://localhost:3001",
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rasskazovpavel/diploma-react.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rasskazovpavel/diploma-react/issues"
+  },
+  "homepage": "https://github.com/rasskazovpavel/diploma-react#readme",
+  "dependencies": {
+    "classnames": "^2.3.2",
+    "express": "^4.18.2",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
   }
 }

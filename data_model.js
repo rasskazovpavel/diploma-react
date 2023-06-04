@@ -18,10 +18,16 @@ const getData = () => {
   });
 };
 
-const PickDataNew = (category, value) => {
+const PickDataNew = (category, value, current) => {
   let queryLine;
   const categories = category.split(",");
   const values = value.split(",");
+  const isCurrent =
+    current === "orbit"
+      ? `WHERE DDate = '-'`
+      : current === "deorbit"
+      ? `WHERE DDate <> '-'`
+      : "";
   if (categories.length > 1) {
     let conditions = ``;
     categories.forEach((cat, index) => {
@@ -35,7 +41,7 @@ const PickDataNew = (category, value) => {
     queryLine = `SELECT COUNT(*) FROM tle.satellite_info_all WHERE ${conditions.slice(
       0,
       -5
-    )}`;
+    )} ${isCurrent}`;
   } else {
     const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
     const secondPart = value
@@ -43,7 +49,7 @@ const PickDataNew = (category, value) => {
         ? `WHERE date_launch >= '${value}-01-01' AND date_launch <= '${value}-12-31'`
         : `WHERE ${category} LIKE '${value}%'`
       : "";
-    queryLine = `SELECT ${firstPart} FROM tle.satellite_info_all ${secondPart}`;
+    queryLine = `SELECT ${firstPart} FROM tle.satellite_info_all ${secondPart} ${isCurrent}`;
   }
   console.log(queryLine);
   return new Promise(function (resolve, reject) {

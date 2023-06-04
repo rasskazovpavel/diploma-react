@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffffff;
+  height: 60px;
+  align-items: center;
+}
+
+.header__buttons {
+  display: flex;
+}
+
+.header__button {
+  padding-right: 3em;
+  cursor: pointer;
+
+  &-active {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+
+.header__logo {
+  img {
+    width: 144px;
+    height: 37.5px;
+  }
+  margin-left: 1em;
+}

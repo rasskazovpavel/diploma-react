@@ -1,0 +1,72 @@
+.filters_checkbox_scroll {
+  width: 45%;
+
+  ul {
+    padding: 0;
+  }
+
+  input[type="checkbox"] {
+    -webkit-appearance: initial;
+    appearance: initial;
+    width: 15px;
+    height: 15px;
+    background: transparent;
+    border: 1px solid #3c4d5f;
+    position: relative;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"]:checked:after {
+    content: "\00D7";
+    color: #3c4d5f;
+    display: inline-block;
+    width: 100%;
+    font-size: 23px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+
+  input[type="text"] {
+    -webkit-appearance: initial;
+    appearance: initial;
+    width: 10rem;
+    height: 20px;
+    background: transparent;
+    border: 1px solid #3c4d5f;
+    position: relative;
+    cursor: pointer;
+    padding: 0.25em 0.5em;
+  }
+}
+
+.scroll_dropdown__wrappers {
+  display: flex;
+}
+
+.scroll_dropdown_btn {
+  width: 10rem;
+  background-color: #d9dddc;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25em 0.5em;
+}
+
+.scroll_dropdown {
+  min-width: 50%;
+  padding-right: 1em;
+}
+
+.filters_menu__checkbox {
+  margin-right: 1em;
+}
+
+.filters_checkbox_scroll__title {
+  display: flex;
+}

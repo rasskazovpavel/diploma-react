@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 import ReactIScroll from "react-iscroll";
 import iScroll from "iscroll";
-import { PickData } from "../../utils/PickData";
 import { PickDataDB } from "../../utils/PickDataDB";
+import "./Filters.scss";
 
 const FiltersCheckBoxScroll = ({
   filtersDataItem,
@@ -72,8 +72,8 @@ const FiltersCheckBoxScroll = ({
   const openDropdown = (e) => {
     if (chosenGraphs.includes(filtersDataItem.name)) {
       const newListOpen = Object.assign({}, listOpen);
-      newListOpen[e.target.innerHTML] = !newListOpen[e.target.innerHTML];
-      console.log(newListOpen, e.target.innerHTML);
+      newListOpen[e.target.id] = !newListOpen[e.target.id];
+      console.log(newListOpen, e.target.id);
       setListOpen(newListOpen);
     }
   };
@@ -209,69 +209,82 @@ const FiltersCheckBoxScroll = ({
 
   console.log(chosenGraphs.includes(graphId));
   return (
-    <>
+    <div className="filters_checkbox_scroll">
       <ul>
-        <li>
+        <li className="filters_checkbox_scroll__title">
           <input
             type="checkbox"
             value={currFilter}
             onChange={(e) => chooseCategory(e)}
+            className="filters_menu__checkbox"
           />
           {filtersDataItem.name}
         </li>
-        {chosenGraphs.includes(filtersDataItem.name) &&
-          Object.entries(filtersDataItem.dropdown).map((entry, i) => {
-            return (
-              <div key={i}>
-                <p className="scroll_dropdown" onClick={openDropdown}>
-                  {entry[1]}
-                </p>
-                {listOpen[entry[1]] && (
-                  <>
-                    <input
-                      type="text"
-                      className="filters_menu__scroll_filter"
-                      placeholder="Введите название"
-                      onInput={(e) => inputHandler(e, entry[0])}
-                    />
-                    {/* <InputText inputHandler={inputHandler} /> */}
-                    {renderedData[entry[0]].length > 0 && (
-                      <ReactIScroll
-                        className="filters_menu__scroll_wrapper"
-                        iScroll={iScroll}
-                        options={{
-                          mouseWheel: true,
-                          scrollbars: true,
-                          interactiveScrollbars: true,
-                        }}
-                      >
-                        <ul>
-                          {renderedData[entry[0]].map((line, i) => {
-                            return (
-                              <li key={line.unit}>
-                                <input
-                                  type="checkbox"
-                                  value={line.unit}
-                                  onChange={(e) =>
-                                    changeCheckboxStatus(e, entry[0])
-                                  }
-                                  checked={line.isChecked}
-                                />
-                                {line.unit}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </ReactIScroll>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })}
+        <div className="scroll_dropdown__wrappers">
+          {chosenGraphs.includes(filtersDataItem.name) &&
+            Object.entries(filtersDataItem.dropdown).map((entry, i) => {
+              return (
+                <div key={i} className="scroll_dropdown">
+                  <p
+                    className="scroll_dropdown_btn"
+                    onClick={openDropdown}
+                    id={entry[1]}
+                  >
+                    <span id={entry[1]}>{entry[1]}</span>
+                    <span id={entry[1]}>
+                      {listOpen[entry[1]] ? <>&#9650;</> : <>&#9660;</>}
+                    </span>
+                  </p>
+                  {listOpen[entry[1]] && (
+                    <div className="filters_menu__scroll__elements">
+                      <input
+                        type="text"
+                        className="filters_menu__scroll_filter"
+                        placeholder="Введите название"
+                        onInput={(e) => inputHandler(e, entry[0])}
+                      />
+                      {/* <InputText inputHandler={inputHandler} /> */}
+                      {renderedData[entry[0]].length > 0 && (
+                        <div className="filters_menu__scroll_inner">
+                          <ReactIScroll
+                            className="filters_menu__scroll_wrapper"
+                            iScroll={iScroll}
+                            options={{
+                              mouseWheel: true,
+                              scrollbars: true,
+                              interactiveScrollbars: true,
+                            }}
+                          >
+                            <ul>
+                              {renderedData[entry[0]].map((line, i) => {
+                                return (
+                                  <li key={line.unit}>
+                                    <input
+                                      type="checkbox"
+                                      className="filters_menu__checkbox"
+                                      value={line.unit}
+                                      onChange={(e) =>
+                                        changeCheckboxStatus(e, entry[0])
+                                      }
+                                      checked={line.isChecked}
+                                    />
+                                    {line.unit}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </ReactIScroll>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </div>
       </ul>
       {/* <button onClick={clearCheckboxes}>Очистить</button> */}
-    </>
+    </div>
   );
 };
 export default FiltersCheckBoxScroll;

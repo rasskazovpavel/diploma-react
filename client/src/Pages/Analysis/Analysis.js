@@ -16,7 +16,6 @@ import {
   LineElement,
 } from "chart.js";
 import { PickDataDB } from "../../utils/PickDataDB";
-import { filtersData } from "../../utils/FiltersData";
 Chart.register(CategoryScale);
 Chart.register(ArcElement);
 Chart.register(CategoryScale);
@@ -30,7 +29,7 @@ Chart.register(LineElement);
 const options = {
   plugins: {
     legend: {
-      // display: false,
+      display: false,
       labels: {
         color: "#3C4D5F",
       },
@@ -112,29 +111,21 @@ export default function Analysis() {
         let nums = [];
         const pickedData = [];
         // для каждого ключа с побочной оси выбираем его данные
-        console.log([axes[currFilter[0]].main, axes[currFilter[0]].secondary]);
         const promises = chosenData[currFilter[0]].main.map((chosenMain) => {
           return PickDataDB(
             [axes[currFilter[0]].main, axes[currFilter[0]].secondary],
             [chosenMain, chosenSecondary]
           ).then((oneData) => {
-            console.log(oneData);
             pickedData.push(oneData);
             return oneData;
-            // console.log(pickedData.length);
           });
         });
         Promise.all(promises).then((promises) => {
-          console.log(promises);
-          // keys.push(chosenSecondary);
           Object.values(pickedData).forEach((elem) => {
-            console.log(Object.keys(elem)[0].split(",")[0]);
             if (firstIteration) keys.push(Object.keys(elem)[0].split(",")[0]);
             nums.push(Object.values(elem)[0]);
           });
           firstIteration = false;
-          console.log(keys, nums, chosenSecondary);
-          console.log(colors);
           if (colors[chosenSecondary]) bgColor = colors[chosenSecondary];
           else {
             bgColor = randColor();
@@ -153,120 +144,39 @@ export default function Analysis() {
               borderWidth: 2,
             },
           ];
-          console.log(updatedDatasets);
-          console.log(updatedDatasets);
 
           const newChartData = Object.assign({}, chartData);
           newChartData[currFilter[0]] = {
             labels: keys,
             datasets: updatedDatasets,
           };
-          // const newChartData = {
-          //   ...chartData,
-          //   labels: keys,
-          //   datasets: updatedDatasets,
-          // };
-          console.log(newChartData);
           setChartData(newChartData);
         });
-        // дополняем нулевыми значениями для тех иксов, которые выбрали, но на этом конкретном игреке они нулевые
-        // chosenData[axes.x].forEach((label) => {
-        //   if (!pickedData[label]) pickedData[label] = 0;
-        // });
-        // сортируем всё по иксу
-        // const sortedData = Object.entries(pickedData).sort();
-        // из сортированного массива массивов достаём ключи и значения
-        // sortedData.forEach((line) => {
-        //   if (firstIteration) keys.push(line[0]);
-        //   nums.push(line[1]);
-        // });
-        // firstIteration = false;
-        //
-        // else {
-        //   bgColor = randColor();
-        //   setColors({ ...colors, [chosenDatum]: bgColor });
-        // }
-        // updatedDatasets = [
-        //   ...updatedDatasets,
-        //   {
-        //     label: chosenDatum,
-        //     data: nums,
-        //     backgroundColor: [bgColor],
-        //     borderColor: "white",
-        //     borderWidth: 2,
-        //   },
-        // ];
       });
-    // console.log(updatedDatasets);
-
-    // const newChartData = Object.assign({}, chartData);
-    // newChartData[currFilter[0]] = {
-    //   labels: keys,
-    //   datasets: updatedDatasets,
-    // };
-    // // const newChartData = {
-    // //   ...chartData,
-    // //   labels: keys,
-    // //   datasets: updatedDatasets,
-    // // };
-    // console.log(newChartData);
-    // setChartData(newChartData);
   };
 
   // собираем данные по выбранным чекбоксам в базе
   const collectChosenData = async () => {
-    console.log(currFilter);
     let typeGraph;
     if (currFilter && Array.isArray(currFilter) && axes[currFilter[0]]) {
       setTypeGraph(axes[currFilter[0]].chart);
       typeGraph = axes[currFilter[0]].chart;
     }
-    console.log(currFilter);
-    // если выбрали чекбокс главной оси
-    // if (axes[currFilter] && currFilter === axes[currFilter].x) {
 
-    console.log(typeGraph);
     if (typeGraph === "barchart" || typeGraph === "linechart") {
-      console.log(chosenData);
       if (
         chosenData[currFilter[0]] &&
         chosenData[currFilter[0]].secondary &&
         chosenData[currFilter[0]].secondary.length > 0
       ) {
-        console.log("погнали");
         handleStackedGraphs();
       } else {
-        // const singleAxisData = PickData(allData, axes.x, chosenData);
-        // let bgColor;
-        // console.log(colors);
-        // if (colors[axes.x]) bgColor = colors[axes.x];
-        // else {
-        //   bgColor = randColor();
-        //   setColors({ ...colors, [axes.x]: bgColor });
-        // }
-        // setChartData({
-        //   labels: Object.keys(singleAxisData),
-        //   datasets: [
-        //     {
-        //       label: "Количество запусков",
-        //       data: Object.values(singleAxisData),
-        //       backgroundColor: bgColor,
-        //       borderColor: "white",
-        //       borderWidth: 2,
-        //     },
-        //   ],
-        // });
-        console.log(axes[currFilter[0]].x);
-        console.log(chosenData);
         if (
           chosenData[currFilter[0]] &&
           chosenData[currFilter[0]].main &&
           chosenData[currFilter[0]].main.length > 0
         ) {
-          console.log(chosenData[currFilter[0]][currFilter[1]]);
-          console.log(chosenData, axes[currFilter[0]]);
           const singleAxis = chosenData[currFilter[0]].main.map((elem) => {
-            console.log(elem);
             return PickDataDB(axes[currFilter[0]].main, elem).then(
               (allData) => {
                 return allData;
@@ -274,7 +184,6 @@ export default function Analysis() {
             );
           });
           Promise.all(singleAxis).then((singleAxis) => {
-            console.log(singleAxis);
             const singleAxisData = {};
             singleAxis.map((elem) => {
               if (colors[Object.keys(elem)[0]])
@@ -299,16 +208,7 @@ export default function Analysis() {
             const colorsChart = Object.values(singleAxisData).map(
               (pair) => pair[1]
             );
-            // const updDatasets = Object.values(singleAxisData).map((pair, i) => {
-            //   return {
-            //     label: Object.keys(singleAxisData)[i],
-            //     data: pair[0],
-            //     backgroundColor: pair[1],
-            //     borderWidth: 2,
-            //   };
-            // });
             const newChartData = Object.assign({}, chartData);
-            console.log(singleAxisData);
             newChartData[currFilter[0]] = {
               labels: Object.keys(singleAxisData),
               datasets: [
@@ -319,13 +219,10 @@ export default function Analysis() {
                   borderWidth: 2,
                 },
               ],
-              // datasets: updDatasets,
             };
-            console.log(newChartData);
             setChartData(newChartData);
           });
         } else {
-          console.log("нету");
           const newChartData = Object.assign({}, chartData);
           newChartData[currFilter[0]] = {
             labels: [],
@@ -338,7 +235,6 @@ export default function Analysis() {
               },
             ],
           };
-          console.log(newChartData);
           setChartData(newChartData);
         }
       }
@@ -385,13 +281,6 @@ export default function Analysis() {
         });
       });
     }
-    // }
-    // если выбрали чекбокс побочной оси
-    // if (currFilter === axes.y) {
-    //   if (typeGraph === "barchart") {
-    //     handleStackedGraphs();
-    //   }
-    // }
   };
 
   // вызываем сбор данных в конце
@@ -401,14 +290,12 @@ export default function Analysis() {
 
   return (
     <div className="analysis__wrapper">
-      <h1 className="analytic__title">Самостоятельный анализ данных</h1>
-      {/* {allData && ( */}
+      <h1 className="analysis__title">Самостоятельный анализ данных</h1>
       <FiltersMenu
         setChosenData={setChosenData}
         chosenData={chosenData}
         setCurrFilter={setCurrFilter}
         currFilter={currFilter}
-        allData={allData}
         axes={axes}
         setAxes={setAxes}
         setTypeGraph={setTypeGraph}
@@ -417,36 +304,45 @@ export default function Analysis() {
         chosenGraphs={chosenGraphs}
         setChosenGraphs={setChosenGraphs}
       />
-      {/* )} */}
       <div className="analysis__graphs">
         {Object.keys(chosenData).map((graph) => {
-          console.log(graph, chosenData);
           const typeGraph = axes[graph].chart;
-          console.log(chosenData, chartData);
           if (chartData[graph] && chartData[graph].labels.length > 0) {
             if (typeGraph === "piechart")
               return (
-                <PieChart
-                  chartData={chartData}
-                  options={optionsPie}
-                  key={graph}
-                />
+                <div className="graph__container piechart__container">
+                  <PieChart
+                    chartData={chartData}
+                    options={optionsPie}
+                    key={graph}
+                    title={graph}
+                  />
+                </div>
               );
             if (typeGraph === "barchart")
-              return (
+              if (axes[graph].secondary && axes[graph].secondary.length > 0) {
+                options.plugins.legend.display = true;
+              } else options.plugins.legend.display = false;
+            return (
+              <div className="graph__container barchart__container">
                 <BarChart
                   chartData={chartData[graph]}
                   options={options}
                   key={graph}
+                  title={graph}
                 />
-              );
+              </div>
+            );
             if (typeGraph === "linechart")
               return (
-                <LineChart
-                  chartData={chartData[graph]}
-                  options={options}
-                  key={graph}
-                />
+                <div className="graph__container linechart__container">
+                  <LineChart
+                    chartData={chartData[graph]}
+                    options={options}
+                    key={graph}
+                    title={graph}
+                  />
+                </div>
               );
           }
         })}
