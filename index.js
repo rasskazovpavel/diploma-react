@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 app.get("/", (req, res) => {
   console.log(req.query);
   data_model
-    .PickDataNew(req.query.cat, req.query.val)
+    .PickDataNew(req.query.cat, req.query.val, req.query.curr)
     .then((response) => {
       res.status(200).send(response);
     })

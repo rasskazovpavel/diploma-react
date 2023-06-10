@@ -20,7 +20,7 @@ const Header = ({ currPage, setCurrPage }) => {
           onClick={changePage}
           data-id={0}
         >
-          Обзор
+          Текущая ситуация
         </p>
         <p
           className={cx("header__button", {
@@ -29,7 +29,7 @@ const Header = ({ currPage, setCurrPage }) => {
           onClick={changePage}
           data-id={1}
         >
-          Анализ
+          Исторические данные
         </p>
         <p
           className={cx("header__button", {
@@ -38,7 +38,7 @@ const Header = ({ currPage, setCurrPage }) => {
           onClick={changePage}
           data-id={2}
         >
-          Отчётность
+          Конструктор
         </p>
       </div>
     </div>

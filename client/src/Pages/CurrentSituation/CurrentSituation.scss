@@ -1,0 +1,21 @@
+.current_situation__graphs {
+  justify-content: center;
+  display: flex;
+  background-color: #ffffff;
+  padding: 2em;
+
+  .barchart__container {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    margin-right: 1em;
+  }
+
+  .piechart__container {
+    width: 35%;
+  }
+
+  .chart-container {
+    width: 100%;
+  }
+}

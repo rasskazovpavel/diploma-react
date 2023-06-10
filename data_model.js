@@ -9,7 +9,7 @@ const pool = new Pool({
 
 const getData = () => {
   return new Promise(function (resolve, reject) {
-    pool.query("SELECT * FROM tle.satellite_info_all", (error, results) => {
+    pool.query("SELECT * FROM tle.satellites_info_new", (error, results) => {
       if (error) {
         reject(error);
       }
@@ -24,32 +24,29 @@ const PickDataNew = (category, value, current) => {
   const values = value.split(",");
   const isCurrent =
     current === "orbit"
-      ? `WHERE DDate = '-'`
+      ? `ddate = '-'`
       : current === "deorbit"
-      ? `WHERE DDate <> '-'`
+      ? `ddate <> '-'`
       : "";
   if (categories.length > 1) {
     let conditions = ``;
     categories.forEach((cat, index) => {
-      if (cat === "date_launch") {
-        console.log(cat, cat.length);
-        conditions =
-          conditions +
-          `date_launch >= '${values[index]}-01-01' AND date_launch <= '${values[index]}-12-31' AND `;
-      } else conditions = conditions + `${cat} LIKE '${values[index]}%' AND `;
+      conditions = conditions + `${cat} LIKE '${values[index]}%' AND `;
     });
-    queryLine = `SELECT COUNT(*) FROM tle.satellite_info_all WHERE ${conditions.slice(
+    queryLine = `SELECT COUNT(*) FROM tle.satellites_info_new WHERE ${conditions.slice(
       0,
       -5
-    )} ${isCurrent}`;
+    )}${isCurrent !== "" ? `AND ${isCurrent}` : ""}`;
   } else {
     const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
-    const secondPart = value
-      ? category === "date_launch"
-        ? `WHERE date_launch >= '${value}-01-01' AND date_launch <= '${value}-12-31'`
-        : `WHERE ${category} LIKE '${value}%'`
-      : "";
-    queryLine = `SELECT ${firstPart} FROM tle.satellite_info_all ${secondPart} ${isCurrent}`;
+    const secondPart = value ? `WHERE ${category} = '${value}'` : "";
+    const thirdPart =
+      isCurrent !== ""
+        ? secondPart !== ""
+          ? `AND ${isCurrent}`
+          : `WHERE ${isCurrent}`
+        : "";
+    queryLine = `SELECT ${firstPart} FROM tle.satellites_info_new ${secondPart} ${thirdPart}`;
   }
   console.log(queryLine);
   return new Promise(function (resolve, reject) {

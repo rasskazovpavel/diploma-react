@@ -2,6 +2,8 @@ import React from "react";
 import { Pie } from "react-chartjs-2";
 
 function PieChart({ chartData, options, title }) {
+  console.log("piechart");
+  console.log(chartData);
   return (
     <div className="chart-container">
       <h2 style={{ textAlign: "center" }}>{title}</h2>

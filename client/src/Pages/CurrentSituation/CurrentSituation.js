@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import PieChart from "../../components/Charts/PieChart";
 import BarChart from "../../components/Charts/BarChart";
 import LineChart from "../../components/Charts/LineChart";
@@ -17,6 +15,7 @@ import {
   Filler,
 } from "chart.js";
 import { PickDataDB } from "../../utils/PickDataDB";
+import { CountryCodes } from "../../utils/CountryCodes";
 Chart.register(CategoryScale);
 Chart.register(ArcElement);
 Chart.register(CategoryScale);
@@ -27,10 +26,33 @@ Chart.register(LineElement);
 Chart.register(Filler);
 
 const optionsPie = {
+  tooltips: {
+    enabled: false,
+  },
   plugins: {
     legend: {
       labels: {
         color: "#3C4D5F",
+      },
+    },
+    datalabels: {
+      formatter: (val, context) =>
+        `${
+          (Number(val) * 100) /
+          context.chart.data.datasets[context.datasetIndex].data.reduce(
+            (a, b) => Number(a) + Number(b),
+            0
+          )
+        }%`,
+      color: "#fff",
+    },
+    tooltip: {
+      callbacks: {
+        label: (item) =>
+          `${item.label}: ${(
+            (item.parsed * 100) /
+            item.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
+          ).toFixed(2)}%`,
       },
     },
   },
@@ -100,80 +122,109 @@ const randColor = () => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
+const sortObj = (obj) => {
+  const keys = Object.keys(obj);
+  keys.sort();
+  const sortedObj = {};
+  const sortedObjLength = keys.length;
+  for (let i = 0; i < sortedObjLength; i++) {
+    let k = keys[i];
+    sortedObj[k] = obj[k];
+  }
+  return sortedObj;
+};
+
 const reviewData = {
   "Распределение спутников на орбите по странам": {
     chart: "barchart",
-    main: "State",
+    main: "state",
     limit: 100,
   },
   "Процентное соотношение запущенных находящихся на орбите спутников по странам (более 1000 запусков)":
     {
       chart: "piechart",
-      main: "State",
+      main: "state",
       limit: 1000,
     },
 };
 
+let allColors = {
+  RU: "rgb(246, 217, 221",
+  CN: "rgb(255, 0, 0)",
+  US: "rgb(0, 0, 255)",
+  IN: "rgb(167, 127, 14)",
+  J: "rgb(222, 49, 49)",
+  F: "rgb(139, 0, 255)",
+  UK: "rgb(128, 128, 128)",
+  Другое: "rgb(0, 255, 0)",
+};
+
 export default function CurrentSituation() {
-  const [colors, setColors] = useState({});
   // данные для графиков (ключи и значения)
   const [chartData, setChartData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   // собираем данные по выбранным чекбоксам в базе
   const collectData = async () => {
     const newChartData = Object.assign({}, chartData);
-    Object.keys(reviewData).forEach((chartElement) => {
+    for await (let chartElement of Object.keys(reviewData)) {
       const data = {};
-      if (!reviewData[chartElement].values) {
-        const pickedData = PickDataDB(reviewData[chartElement].main, "").then(
-          (allLabels) => {
-            console.log("here");
-            const allValues = Object.keys(allLabels).map((label) => {
-              return PickDataDB(reviewData[chartElement].main, label).then(
-                (value) => {
-                  data[label] = value;
-                }
-              );
+      const pickedData = PickDataDB(reviewData[chartElement].main, "", "orbit")
+        .then((allLabels) => {
+          console.log(allLabels);
+          const allValues = Object.keys(allLabels).map((label) => {
+            return PickDataDB(
+              reviewData[chartElement].main,
+              label,
+              "orbit"
+            ).then((value) => {
+              data[label] = value;
             });
-            return Promise.all(allValues).then((allValues) => {
-              // console.log(data);
-              // console.log(Object.keys(data));
-              return data;
-            });
-          }
-        );
-        pickedData.then((pickedData) => {
-          pickedData = Object.entries(pickedData).reduce((acc, pair) => {
+          });
+          return Promise.all(allValues).then((allValues) => {
+            return data;
+          });
+        })
+        // eslint-disable-next-line no-loop-func
+        .then((pickedDataRaw) => {
+          console.log(pickedDataRaw);
+          pickedDataRaw = Object.entries(pickedDataRaw).reduce((acc, pair) => {
+            if (pair[0] === "SU" || pair[0] === "RU") {
+              console.log(pair[1][pair[0]], pair[0]);
+              if (acc["RU"] === undefined) acc["RU"] = Number(pair[1][pair[0]]);
+              else acc["RU"] += Number(pair[1][pair[0]]);
+              return acc;
+            }
             if (
               reviewData[chartElement].limit &&
               pair[1][pair[0]] < reviewData[chartElement].limit
             ) {
-              // console.log(typeof Number(pair[1][pair[0]]));
               if (acc["Другое"] !== undefined)
                 acc["Другое"] += Number(pair[1][pair[0]]);
               else acc["Другое"] = 0;
+              return acc;
             } else {
               acc[pair[0]] = pair[1][pair[0]];
+              return acc;
             }
-            return acc;
           }, {});
-          // }
+          pickedDataRaw["Другое"] = String(pickedDataRaw["Другое"]);
+
+          const pickedData = sortObj(pickedDataRaw);
+
           const values = Object.values(pickedData);
 
           const chartColors = {};
           const chartLineColor = "#3c4d5f";
           if (reviewData[chartElement].chart !== "linechart") {
             Object.keys(pickedData).forEach((key) => {
-              if (colors[key]) chartColors[key] = colors[key];
+              if (allColors[key]) chartColors[key] = allColors[key];
               else {
                 let bgColor = randColor();
-                // console.log(bgColor);
-                let newColors = { ...colors, [key]: bgColor };
-                setColors(newColors);
+                allColors[key] = bgColor;
                 chartColors[key] = bgColor;
               }
             });
-            // console.log(chartColors);
           }
 
           const bgColors =
@@ -182,135 +233,51 @@ export default function CurrentSituation() {
               : chartLineColor;
 
           newChartData[chartElement] = {};
-          newChartData[chartElement].labels = Object.keys(pickedData);
+          console.log(Object.keys(pickedData));
+          newChartData[chartElement].labels = Object.keys(pickedData).map(
+            (key) => {
+              if (CountryCodes[key]) return CountryCodes[key];
+              return key;
+            }
+          );
           newChartData[chartElement].datasets = [
             {
-              label: chartElement,
+              label: "Количество спутников",
               data: values,
               backgroundColor: bgColors,
               fill: true,
               borderWidth: 2,
             },
           ];
-          // console.log(newChartData);
+          console.log(newChartData);
+          return newChartData;
+        })
+        .then((newChartData) => {
+          console.log(newChartData);
           setChartData(newChartData);
+          if (
+            Object.keys(reviewData).length - 1 ===
+            Object.keys(newChartData).length - 1
+          )
+            setLoading(false);
         });
-      } else {
-        const finalData = {};
-        const properYears = PickDataDB(reviewData[chartElement].main, "").then(
-          (allData) => {
-            const years = Object.keys(allData);
-            reviewData[chartElement].values.forEach((country) => {
-              finalData[country] = {};
-              const countedData = years.map((year) => {
-                return PickDataDB(
-                  [
-                    reviewData[chartElement].main,
-                    reviewData[chartElement].secondary,
-                  ],
-                  [year, country]
-                ).then((data) => {
-                  finalData[country][year] = data;
-                });
-              });
-              return Promise.all(countedData).then((data) => {
-                console.log(finalData, Object.entries(finalData));
-                newChartData[chartElement] = {};
-                const labels = [];
-                let firstIteration = true;
-                const newDatasets = Object.entries(finalData).map(
-                  ([key, value]) => {
-                    console.log(value);
-                    const mappedAmountByCountry = Object.entries(value).map(
-                      ([year, countryObj]) => {
-                        if (firstIteration) labels.push(year);
-                        return Object.values(countryObj)[0];
-                      }
-                    );
-                    firstIteration = false;
-                    return {
-                      label: key,
-                      data: mappedAmountByCountry,
-                      backgroundColor: reviewData[chartElement].colors[key],
-                    };
-                  }
-                );
-                newChartData[chartElement].datasets = newDatasets;
-                newChartData[chartElement].labels = labels;
-                console.log(newChartData);
-                setChartData(newChartData);
-                // newChartData[chartElement].datasets = newDatasets;
-              });
-            });
-          }
-        );
-      }
-    });
+    }
   };
 
-  const div2PDF = (e) => {
-    // const but = e.target;
-    // but.style.display = "none";
-    // let inputs = window.document.getElementsByClassName("chart-container");
-    // let arr = [].slice.call(inputs);
-    // console.log(inputs);
-    // arr.forEach((input) => {
-    //   console.log(input);
-    // });
-    // let container =
-    //   window.document.getElementsByClassName("content__wrapper")[0];
-    // arr.forEach((input) => {
-    // html2canvas(input).then((canvas) => {
-    //   const pdf = new jsPDF("l", "pt");
-    //   const img = canvas.toDataURL("image/png");
-    //   // pdf.setFillColor(0, 0, 0, 1);
-    //   // pdf.rect(10, 10, 150, 160, "F");
-    //   pdf.addImage(
-    //     img,
-    //     "png",
-    //     input.offsetLeft - container.offsetLeft,
-    //     input.offsetTop - container.offsetTop,
-    //     input.style.width,
-    //     input.style.height
-    //   );
-    //   but.style.display = "block";
-    //   pdf.save("chart.pdf");
-    // });
-    // });
-    // console.log(arr);
-    // const tasks = arr.map((tab) => html2canvas(tab));
-    // console.log(tasks);
-    // const pdf = new jsPDF();
-    // const width = pdf.internal.pageSize.getWidth();
-    // const height = pdf.internal.pageSize.getHeight();
-    // Promise.all(tasks).then((canvases) => {
-    //   for (const canvas of canvases) {
-    //     const imgData = canvas.toDataURL("image/png");
-    //     pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-    //     pdf.addPage();
-    //   }
-    //   pdf.save("Download.pdf");
-    // });
-  };
-
-  // вызываем сбор данных в конце
   useEffect(() => {
     collectData();
   }, []);
 
+  if (loading) return <p>Загрузка...</p>;
   return (
-    <div className="review__wrapper">
-      <h1 className="review__title">Самостоятельный анализ данных</h1>
-      <button className="pdf__button" onClick={(e) => div2PDF(e)}>
-        Экспортировать в PDF
-      </button>
-      {/* )} */}
-      <div className="review__graphs">
+    <div className="current_situation__wrapper">
+      <h1 className="current_situation__title">
+        Текущая ситуация
+      </h1>
+      <div className="current_situation__graphs">
         {Object.keys(reviewData).map((graph) => {
           const typeGraph = reviewData[graph].chart;
-          // console.log(Object.keys(reviewData));
           if (chartData[graph] && chartData[graph].labels.length > 0) {
-            // console.log(typeGraph, chartData, graph);
             if (typeGraph === "piechart")
               return (
                 <div className="graph__container piechart__container">

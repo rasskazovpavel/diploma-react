@@ -74,6 +74,51 @@ const randColor = () => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
+const div2PDF = (e) => {
+  // const but = e.target;
+  // but.style.display = "none";
+  // let inputs = window.document.getElementsByClassName("chart-container");
+  // let arr = [].slice.call(inputs);
+  // console.log(inputs);
+  // arr.forEach((input) => {
+  //   console.log(input);
+  // });
+  // let container =
+  //   window.document.getElementsByClassName("content__wrapper")[0];
+  // arr.forEach((input) => {
+  // html2canvas(input).then((canvas) => {
+  //   const pdf = new jsPDF("l", "pt");
+  //   const img = canvas.toDataURL("image/png");
+  //   // pdf.setFillColor(0, 0, 0, 1);
+  //   // pdf.rect(10, 10, 150, 160, "F");
+  //   pdf.addImage(
+  //     img,
+  //     "png",
+  //     input.offsetLeft - container.offsetLeft,
+  //     input.offsetTop - container.offsetTop,
+  //     input.style.width,
+  //     input.style.height
+  //   );
+  //   but.style.display = "block";
+  //   pdf.save("chart.pdf");
+  // });
+  // });
+  // console.log(arr);
+  // const tasks = arr.map((tab) => html2canvas(tab));
+  // console.log(tasks);
+  // const pdf = new jsPDF();
+  // const width = pdf.internal.pageSize.getWidth();
+  // const height = pdf.internal.pageSize.getHeight();
+  // Promise.all(tasks).then((canvases) => {
+  //   for (const canvas of canvases) {
+  //     const imgData = canvas.toDataURL("image/png");
+  //     pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+  //     pdf.addPage();
+  //   }
+  //   pdf.save("Download.pdf");
+  // });
+};
+
 export default function Analysis() {
   const [chosenData, setChosenData] = useState({}); // выбранные чекбоксы
   const [currFilter, setCurrFilter] = useState([]); // текущий фильтр (назначение, страна, высота)
