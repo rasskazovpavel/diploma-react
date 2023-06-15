@@ -17,9 +17,9 @@ export const PickDataDB = (category, value, current = "no") => {
       let newData = JSON.parse(data).rows;
       // console.log(newData);
       if (!value) {
-        if (category === "plname") {
+        if (category === "name") {
           const newDataValues = newData.map(
-            ({ name_sat }) => name_sat.split(" ")[0].split("-")[0]
+            ({ name }) => name.split(" ")[0].split("-")[0]
           );
           newData = newDataValues.reduce((acc, val) => {
             if (!Object.keys(acc).includes(val)) acc[val] = 1;

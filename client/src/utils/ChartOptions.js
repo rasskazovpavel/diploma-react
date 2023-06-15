@@ -1,0 +1,105 @@
+import { TooltipCodes } from "./TooltipCodes";
+
+export const ChartOptions = {
+  optionsPie: {
+    tooltips: {
+      enabled: false,
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: "#3C4D5F",
+        },
+      },
+      datalabels: {
+        formatter: (val, context) =>
+          `${
+            (Number(val) * 100) /
+            context.chart.data.datasets[context.datasetIndex].data.reduce(
+              (a, b) => Number(a) + Number(b),
+              0
+            )
+          }%`,
+        color: "#fff",
+      },
+      tooltip: {
+        callbacks: {
+          label: (item) =>
+            `${item.label}: ${(
+              (item.parsed * 100) /
+              item.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
+            ).toFixed(2)}%`,
+        },
+      },
+    },
+  },
+  optionsBar: {
+    plugins: {
+      legend: {
+        display: false,
+        labels: {
+          color: "#3C4D5F",
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title: (xDatapoint) => {
+            if (TooltipCodes[xDatapoint[0].label])
+              return TooltipCodes[xDatapoint[0].label];
+            return xDatapoint[0].label;
+          },
+          label: (yDatapoint) => {
+            return yDatapoint[0];
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        stacked: true,
+        border: {
+          color: "#3C4D5F",
+        },
+        ticks: {
+          color: "#3C4D5F",
+        },
+      },
+      y: {
+        stacked: true,
+        border: {
+          color: "#3C4D5F",
+        },
+        ticks: {
+          color: "#3C4D5F",
+        },
+      },
+    },
+  },
+  optionsLine: {
+    plugins: {
+      legend: {
+        labels: {
+          color: "#3C4D5F",
+        },
+      },
+    },
+    scales: {
+      x: {
+        border: {
+          color: "#3C4D5F",
+        },
+        ticks: {
+          color: "#3C4D5F",
+        },
+      },
+      y: {
+        border: {
+          color: "#3C4D5F",
+        },
+        ticks: {
+          color: "#3C4D5F",
+        },
+      },
+    },
+  },
+};

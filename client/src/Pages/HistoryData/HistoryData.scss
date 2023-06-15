@@ -1,0 +1,35 @@
+.history__title {
+  margin: 0;
+  border-bottom: 5px solid #1b395b;
+}
+
+.history__graphs {
+  padding: 2em;
+  max-width: 100%;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #ffffff;
+
+  .barchart__container {
+    width: 80%;
+    display: flex;
+    align-items: center;
+  }
+
+  .barchart__container_0 {
+    width: 65%;
+  }
+
+  .piechart__container {
+    width: 35%;
+  }
+
+  .linechart__container {
+    width: 90%;
+  }
+
+  .chart-container {
+    width: 100%;
+  }
+}

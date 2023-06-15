@@ -15,21 +15,10 @@ app.use(function (req, res, next) {
   next();
 });
 
-// app.get("/", (req, res) => {
-//   data_model
-//     .getData()
-//     .then((response) => {
-//       res.status(200).send(response);
-//     })
-//     .catch((error) => {
-//       res.status(500).send(error);
-//     });
-// });
-
 app.get("/", (req, res) => {
   console.log(req.query);
   data_model
-    .PickDataNew(req.query.cat, req.query.val, req.query.curr)
+    .PickData(req.query.cat, req.query.val, req.query.curr)
     .then((response) => {
       res.status(200).send(response);
     })
@@ -42,11 +31,3 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}.`);
 });
-
-// Have Node serve the files for our built React app
-// app.use(express.static("client/build"));
-
-// All other GET requests not handled before will return our React app
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-// });

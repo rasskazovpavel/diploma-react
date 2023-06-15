@@ -3,12 +3,17 @@
   display: flex;
   background-color: #ffffff;
   padding: 2em;
+  flex-wrap: wrap;
 
   .barchart__container {
     width: 60%;
     display: flex;
     align-items: center;
     margin-right: 1em;
+  }
+
+  .barchart__container_2 {
+    width: 90%;
   }
 
   .piechart__container {

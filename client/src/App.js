@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import Analysis from "./Pages/Analysis/Analysis";
+import { useState } from "react";
+import Constructor from "./Pages/Constructor/Constructor";
 import Header from "./components/Header/Header";
-import Review from "./Pages/Review/Review";
+import HistoryData from "./Pages/HistoryData/HistoryData";
 import CurrentSituation from "./Pages/CurrentSituation/CurrentSituation";
 export default function App() {
   const [currPage, setCurrPage] = useState("0");
@@ -10,8 +10,8 @@ export default function App() {
       <Header currPage={currPage} setCurrPage={setCurrPage} />
       <div className="content__wrapper">
         {currPage == 0 && <CurrentSituation />}
-        {currPage == 1 && <Review />}
-        {currPage == 2 && <Analysis />}
+        {currPage == 1 && <HistoryData />}
+        {currPage == 2 && <Constructor />}
       </div>
     </div>
   );

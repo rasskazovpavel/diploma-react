@@ -18,7 +18,7 @@ const getData = () => {
   });
 };
 
-const PickDataNew = (category, value, current) => {
+const PickData = (category, value, current) => {
   let queryLine;
   const categories = category.split(",");
   const values = value.split(",");
@@ -61,5 +61,5 @@ const PickDataNew = (category, value, current) => {
 
 module.exports = {
   getData,
-  PickDataNew,
+  PickData,
 };
