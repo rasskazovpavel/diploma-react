@@ -1,289 +1,204 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactIScroll from "react-iscroll";
 import iScroll from "iscroll";
 import { PickDataDB } from "../../utils/PickDataDB";
 import "./Filters.scss";
+import { sortObj } from "../../utils/utilsFunctions";
+import { TableCodes } from "../../utils/TableCodes";
+import { TooltipCodes } from "../../utils/TooltipCodes";
 
 const FiltersCheckBoxScroll = ({
   filtersDataItem,
   setChosenData,
-  setCurrFilter,
   chosenData,
-  currFilter,
-  graphId,
-  chartData,
-  setChartData,
-  chosenGraphs,
-  setChosenGraphs,
+  order,
 }) => {
   // отбираем из таблицы данные по нужной категории
-  const [listOpen, setListOpen] = useState({});
+  const [listOpen, setListOpen] = useState(false);
   const [data, setData] = useState({});
   const [renderedData, setRenderedData] = useState({});
-  const [inputQuery, setInputQuery] = useState({});
-
-  // const [data, setData] = useState(
-  //   Object.keys(PickData(allData, filtersDataItem.id)).map((item) => {
-  //     return { unit: item };
-  //   })
-  // );
-
-  // const [parentChecked, setParentChecked] = useState(false);
-
-  const chooseCategory = (e) => {
-    let newChosenGraphs = [...chosenGraphs];
-    if (chosenGraphs.includes(filtersDataItem.name)) {
-      const index = chosenGraphs.indexOf(filtersDataItem.name);
-      if (index !== -1) {
-        console.log(data);
-        newChosenGraphs.splice(index, 1);
-        const newData = {};
-        Object.entries(data).forEach(([key, val]) => {
-          newData[key] = val.map((el) => {
-            return { unit: el.unit, isChecked: false, value: el.value };
-          });
-        });
-        console.log(newData);
-        // const currData = data.map((line) => {
-        //   return { unit: line.unit, isChecked: false, value: line.value };
-        // });
-        // const newData = [...currData];
-        filterList(inputQuery, newData, null);
-        setData(newData);
-        const newChosenData = Object.assign({}, chosenData);
-        console.log(chosenData);
-        Object.keys(chosenData).forEach((key) => {
-          newChosenData[key] = [];
-        });
-        setChosenData(newChosenData);
-        const newListOpen = Object.assign({}, listOpen);
-        console.log(newListOpen);
-        Object.keys(newListOpen).forEach((key) => (newListOpen[key] = false));
-        setListOpen(newListOpen);
-      }
-    } else {
-      newChosenGraphs.push(filtersDataItem.name);
-    }
-    console.log(newChosenGraphs, graphId);
-    setChosenGraphs(newChosenGraphs);
-    setCurrFilter([filtersDataItem.name]);
-  };
+  const [inputQuery, setInputQuery] = useState();
 
   const openDropdown = (e) => {
-    if (chosenGraphs.includes(filtersDataItem.name)) {
-      const newListOpen = Object.assign({}, listOpen);
-      newListOpen[e.target.id] = !newListOpen[e.target.id];
-      console.log(newListOpen, e.target.id);
-      setListOpen(newListOpen);
-    }
+    setListOpen(!listOpen);
   };
 
-  const filterList = (value, currData, axes) => {
-    console.log("тут");
-    // if (axes === null)
-    if (value && axes !== null) {
-      let filteredData = currData[axes].filter((line) => {
-        console.log(line.unit);
-        return line.unit.toLowerCase().includes(value.toLowerCase());
+  const filterList = (value, currData) => {
+    if (value) {
+      let filteredData = currData.filter((line) => {
+        if (line.isChecked) return true;
+        return line.rusName.toLowerCase().includes(value.toLowerCase());
       });
-      const newData = Object.assign({}, currData);
-      newData[axes] = filteredData;
-      console.log(newData);
+      const newData = filteredData.sort((a, b) => {
+        if (a.isChecked && !b.isChecked) return -1;
+        if (!a.isChecked && b.isChecked) return 1;
+        if ((a.isChecked && b.isChecked) || (!a.isChecked && !b.isChecked)) {
+          return a.unit > b.unit ? 1 : -1;
+        }
+        return 0;
+      });
       setRenderedData(newData);
-      console.log(newData);
     } else {
-      setRenderedData(currData);
+      const newData = currData.sort((a, b) => {
+        if (a.isChecked && !b.isChecked) return -1;
+        if (!a.isChecked && b.isChecked) return 1;
+        if ((a.isChecked && b.isChecked) || (!a.isChecked && !b.isChecked)) {
+          return a.unit > b.unit ? 1 : -1;
+        }
+        return 0;
+      });
+      setRenderedData(newData);
     }
   };
 
-  const inputHandler = (e, axes) => {
-    const newInput = Object.assign({}, inputQuery);
-    newInput[axes] = e.target.value;
+  const inputHandler = (e) => {
+    const newInput = e.target.value;
     setInputQuery(newInput);
-    filterList(e.target.value, data, axes);
+    filterList(newInput, data);
   };
 
   // обновляем выбранные данные
-  const updateChosenData = (currData, axes) => {
-    // обновляем текущий фильтр в App.js
-    // если все фильтры категории выбраны, то родительский тоже
-    // if (currData.every((line) => line.isChecked === true)) {
-    //   setParentChecked(true);
-    // } else setParentChecked(false);
-    // собираем в массивы выбранные фильтры
-
-    const selectedData = currData[axes].reduce((acc, line) => {
+  const updateChosenData = (currData) => {
+    const selectedData = currData.reduce((acc, line) => {
       if (line.isChecked) {
         acc.push(line.unit);
       }
       return acc;
     }, []);
-    // const newData = { ...chosenData, [filtersDataItem.id]: selectedData };
-    console.log(chosenData, filtersDataItem);
     const newData = Object.assign({}, chosenData);
-    const oldProp = newData[filtersDataItem.name] || {};
-    oldProp[axes] = [...selectedData];
-    newData[filtersDataItem.name] = oldProp;
-    // const newData = {
-    //   ...chosenData,
-    //   [filtersDataItem.name]: {
-    //     ...chosenData[filtersDataItem.id],
-    //     [axes]: [...selectedData],
-    //   },
-    // };
-    console.log(currData);
-    // newData[filtersDataItem.id] = selectedData;
+    const oldProp = [...selectedData];
+    newData[order] = oldProp;
     setChosenData(newData);
-    setCurrFilter([filtersDataItem.name, axes]);
   };
 
   // обновляем фильтры категории
-  const changeCheckboxStatus = (e, axes) => {
-    console.log(axes);
-    const currData = data[axes].map((line) =>
+  const changeCheckboxStatus = (e) => {
+    const currData = data.map((line) =>
       line.unit === e.target.value
         ? {
             unit: line.unit,
             isChecked: !line.isChecked,
             value: line.value,
+            rusName: line.rusName,
           }
         : line
     );
-    const newData = Object.assign({}, data);
-    newData[axes] = currData;
-    console.log(newData);
-    updateChosenData(newData, axes);
-    // filterList(inputQuery);
+    const newData = [...currData];
+    updateChosenData(newData);
     setData(newData);
-    filterList(inputQuery[axes], newData, axes);
+    filterList(inputQuery, newData);
   };
 
-  // обновляем родительский чекбокс
-  // const changeParentCheckbox = (e) => {
-  //   setParentChecked(e.currentTarget.checked);
-  //   const currData = data.map((line, order) => {
-  //     return { unit: data[order].unit, isChecked: e.currentTarget.checked };
-  //   });
-  //   updateChosenData(currData);
-  //   setData(currData);
-  // };
-
-  // const clearCheckboxes = () => {
-  //   setParentChecked(false);
-  //   const currData = data.map((line, order) => {
-  //     return { unit: data[order].unit, isChecked: false };
-  //   });
-  //   updateChosenData(currData);
-  //   setData(currData);
-  // };
+  const clearCheckboxes = () => {
+    const newData = [];
+    data.forEach((line, order) => {
+      newData.push({
+        unit: line.unit,
+        isChecked: false,
+        value: line.value,
+        rusName: line.rusName,
+      });
+    });
+    updateChosenData(newData);
+    setData(newData);
+    setRenderedData(newData);
+  };
 
   useEffect(() => {
-    // const totalData = {};
-    // const singleAxis = chosenData[axes[currFilter].x].map((elem) => {
-    //   return PickDataDB(axes[currFilter].x, elem).then((allData) => {
-    //     return allData;
-    //   });
-    // });
-    const totalData = Object.values(filtersDataItem.id).map((id) => {
-      console.log(id);
-      return PickDataDB(id, "").then((allData) => {
-        const keys = Object.keys(allData);
+    PickDataDB(filtersDataItem.id, "")
+      .then((allData) => {
+        const sortedData = sortObj(allData);
+        const keys = Object.keys(sortedData);
         const newData = keys.map((key) => {
-          return { unit: key, value: allData[key] };
+          const rusName =
+            TableCodes[filtersDataItem.id] &&
+            TableCodes[filtersDataItem.id][key]
+              ? TooltipCodes[TableCodes[filtersDataItem.id][key]]
+                ? TooltipCodes[TableCodes[filtersDataItem.id][key]]
+                : TableCodes[filtersDataItem.id][key]
+              : key;
+          return { unit: key, value: allData[key], rusName: rusName };
         });
         return newData;
+      })
+      .then((totalData) => {
+        setData(totalData);
+        setRenderedData(totalData);
       });
-    });
-    Promise.all(totalData).then((totalData) => {
-      console.log(totalData);
-      const finalData = {};
-      totalData.forEach((arr, i) => {
-        console.log(filtersDataItem.id);
-        finalData[Object.keys(filtersDataItem.id)[i]] = totalData[i];
-      });
-      console.log(finalData);
-      setData(finalData);
-      setRenderedData(finalData);
-    });
-  }, [filtersDataItem.id]);
+  }, [filtersDataItem]);
 
-  console.log(chosenGraphs.includes(graphId));
   return (
     <div className="filters_checkbox_scroll">
       <ul>
-        <li className="filters_checkbox_scroll__title">
-          <input
-            type="checkbox"
-            value={currFilter}
-            onChange={(e) => chooseCategory(e)}
-            className="filters_menu__checkbox"
-          />
-          {filtersDataItem.name}
-        </li>
         <div className="scroll_dropdown__wrappers">
-          {chosenGraphs.includes(filtersDataItem.name) &&
-            Object.entries(filtersDataItem.dropdown).map((entry, i) => {
-              return (
-                <div key={i} className="scroll_dropdown">
-                  <p
-                    className="scroll_dropdown_btn"
-                    onClick={openDropdown}
-                    id={entry[1]}
-                  >
-                    <span id={entry[1]}>{entry[1]}</span>
-                    <span id={entry[1]}>
-                      {listOpen[entry[1]] ? <>&#9650;</> : <>&#9660;</>}
-                    </span>
-                  </p>
-                  {listOpen[entry[1]] && (
-                    <div className="filters_menu__scroll__elements">
-                      <input
-                        type="text"
-                        className="filters_menu__scroll_filter"
-                        placeholder="Введите название"
-                        onInput={(e) => inputHandler(e, entry[0])}
-                      />
-                      {/* <InputText inputHandler={inputHandler} /> */}
-                      {renderedData[entry[0]].length > 0 && (
-                        <div className="filters_menu__scroll_inner">
-                          <ReactIScroll
-                            className="filters_menu__scroll_wrapper"
-                            iScroll={iScroll}
-                            options={{
-                              mouseWheel: true,
-                              scrollbars: true,
-                              interactiveScrollbars: true,
-                            }}
-                          >
-                            <ul>
-                              {renderedData[entry[0]].map((line, i) => {
-                                return (
-                                  <li key={line.unit}>
-                                    <input
-                                      type="checkbox"
-                                      className="filters_menu__checkbox"
-                                      value={line.unit}
-                                      onChange={(e) =>
-                                        changeCheckboxStatus(e, entry[0])
-                                      }
-                                      checked={line.isChecked}
-                                    />
-                                    {line.unit}
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </ReactIScroll>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="scroll_dropdown">
+            <p
+              className="scroll_dropdown_btn"
+              onClick={openDropdown}
+              id={filtersDataItem.id}
+            >
+              <span id={filtersDataItem.id}>{filtersDataItem.dropdown}</span>
+              <span id={filtersDataItem.id}>
+                {listOpen ? <>&#9650;</> : <>&#9660;</>}
+              </span>
+            </p>
+            {listOpen && (
+              <div className="filters_menu__scroll__elements">
+                <input
+                  type="text"
+                  className="filters_menu__scroll_filter"
+                  placeholder="Введите название"
+                  onInput={(e) => inputHandler(e, order)}
+                />
+                {renderedData.length > 0 && (
+                  <div className="filters_menu__scroll_inner">
+                    <ReactIScroll
+                      className="filters_menu__scroll_wrapper"
+                      iScroll={iScroll}
+                      options={{
+                        mouseWheel: true,
+                        scrollbars: true,
+                        interactiveScrollbars: true,
+                      }}
+                    >
+                      <ul>
+                        {renderedData.map((line, i) => {
+                          return (
+                            <li key={line.unit}>
+                              <input
+                                type="checkbox"
+                                className="filters_menu__checkbox"
+                                value={line.unit}
+                                onChange={(e) => changeCheckboxStatus(e, order)}
+                                checked={line.isChecked}
+                              />
+                              {TableCodes[filtersDataItem.id] &&
+                              TableCodes[filtersDataItem.id][line.unit]
+                                ? TooltipCodes[
+                                    TableCodes[filtersDataItem.id][line.unit]
+                                  ]
+                                  ? TooltipCodes[
+                                      TableCodes[filtersDataItem.id][line.unit]
+                                    ]
+                                  : TableCodes[filtersDataItem.id][line.unit]
+                                : line.unit}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </ReactIScroll>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </ul>
-      {/* <button onClick={clearCheckboxes}>Очистить</button> */}
+      {listOpen && (
+        <button className="filters_menu__clear" onClick={clearCheckboxes}>
+          Очистить
+        </button>
+      )}
     </div>
   );
 };

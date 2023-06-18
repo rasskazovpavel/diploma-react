@@ -1,6 +1,8 @@
+input[type="radio"] {
+  accent-color: #1b395b;
+  cursor: pointer;
+}
 .filters_checkbox_scroll {
-  width: 45%;
-
   ul {
     padding: 0;
   }
@@ -9,6 +11,7 @@
     -webkit-appearance: initial;
     appearance: initial;
     width: 15px;
+    min-width: 15px;
     height: 15px;
     background: transparent;
     border: 1px solid #3c4d5f;
@@ -69,4 +72,24 @@
 
 .filters_checkbox_scroll__title {
   display: flex;
+}
+
+.filters__axes {
+  display: flex;
+}
+
+.filters__type_graph {
+  margin-right: 2em;
+}
+
+.filters__axes--main {
+  margin-right: 2em;
+}
+
+.filters_menu__clear {
+  background-color: #d9dddc;
+  border: none;
+  padding: 0.5em;
+  color: #3c4d5f;
+  cursor: pointer;
 }

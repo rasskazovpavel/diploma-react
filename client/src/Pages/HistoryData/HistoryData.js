@@ -267,7 +267,7 @@ export default function HistoryData() {
                 >
                   <PieChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsPie}
+                    options={ChartOptions().optionsPie}
                     key={graph}
                     title={graph}
                   />
@@ -284,7 +284,7 @@ export default function HistoryData() {
                 >
                   <BarChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsBar}
+                    options={ChartOptions().optionsBar}
                     key={graph}
                     title={graph}
                   />
@@ -301,7 +301,7 @@ export default function HistoryData() {
                 >
                   <LineChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsLine}
+                    options={ChartOptions().optionsLine}
                     key={graph}
                     title={graph}
                   />

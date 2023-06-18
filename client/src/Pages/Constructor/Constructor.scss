@@ -10,15 +10,28 @@
 
 .constructor__graphs {
   max-width: 100%;
-  display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
 
   .graph__container {
-    width: 80%;
     margin-right: 1em;
+    width: 80%;
+  }
+
+  .piechart__container {
+    width: 50%;
+    margin: 0 auto;
   }
 
   .constructor__container {
     width: 45%;
   }
+}
+
+.constructor__pdf {
+  background-color: #d9dddc;
+  color: #3c4d5f;
+  border: none;
+  padding: 0.5em;
+  margin-top: 1em;
+  cursor: pointer;
 }

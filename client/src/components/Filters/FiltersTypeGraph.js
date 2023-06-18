@@ -12,7 +12,7 @@ const FiltersTypeGraph = ({
   };
   return (
     <div className="filters__type_graph">
-      <p>Выберите тип графика</p>
+      <p>Выберите способ визуализации</p>
       <div className="filters__type_bar">
         <input type="radio" name="type" value="barchart" onClick={handleType} />{" "}
         Столбчатая диаграмма

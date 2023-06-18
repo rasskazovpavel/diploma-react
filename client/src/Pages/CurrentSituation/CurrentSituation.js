@@ -186,7 +186,7 @@ export default function CurrentSituation() {
                 >
                   <PieChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsPie}
+                    options={ChartOptions().optionsPie}
                     key={graph}
                     title={graph}
                   />
@@ -203,7 +203,7 @@ export default function CurrentSituation() {
                 >
                   <BarChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsBar}
+                    options={ChartOptions().optionsBar}
                     key={graph}
                     title={graph}
                   />
@@ -220,7 +220,7 @@ export default function CurrentSituation() {
                 >
                   <LineChart
                     chartData={chartData[graph]}
-                    options={ChartOptions.optionsLine}
+                    options={ChartOptions().optionsLine}
                     key={graph}
                     title={graph}
                   />

@@ -1,11 +1,18 @@
-import { useState } from "react";
 import { filtersData } from "../../utils/FiltersData";
 
-const FiltersAxes = ({ axes, setAxes, typeGraph }) => {
+const FiltersAxes = ({
+  axes,
+  setAxes,
+  typeGraph,
+  setChartData,
+  setChosenData,
+}) => {
   const handleMain = (e) => {
-    const newAxes = Object.assign({}, axes);
+    const newAxes = {};
     newAxes.x = e.target.value;
     setAxes(newAxes);
+    setChosenData({});
+    setChartData({ labels: [], datasets: [] });
   };
 
   const handleSecondary = (e) => {
@@ -16,23 +23,25 @@ const FiltersAxes = ({ axes, setAxes, typeGraph }) => {
 
   return (
     <div className="filters__axes">
-      <p>Выберите главную ось</p>
-      {filtersData.map((line, i) => {
-        return (
-          <div key={i}>
-            <input
-              type="radio"
-              name="main"
-              value={line.id}
-              onClick={handleMain}
-              checked={axes.x === line.id}
-            />{" "}
-            {line.name}
-          </div>
-        );
-      })}
-      {typeGraph === "barchart" && (
-        <>
+      <div className="filters__axes--main">
+        <p>Выберите главную ось</p>
+        {filtersData.map((line, i) => {
+          return (
+            <div key={i}>
+              <input
+                type="radio"
+                name="main"
+                value={line.id}
+                onClick={handleMain}
+                checked={axes.x === line.id}
+              />{" "}
+              {line.name}
+            </div>
+          );
+        })}
+      </div>
+      {(typeGraph === "barchart" || typeGraph === "linechart") && (
+        <div className="filters__axes--secondary">
           <p>Выберите побочную ось</p>
           {filtersData.map((line, i) => {
             if (line.id !== axes.x)
@@ -49,7 +58,7 @@ const FiltersAxes = ({ axes, setAxes, typeGraph }) => {
                 </div>
               );
           })}
-        </>
+        </div>
       )}
     </div>
   );

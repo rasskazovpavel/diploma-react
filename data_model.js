@@ -38,15 +38,19 @@ const PickData = (category, value, current) => {
       -5
     )}${isCurrent !== "" ? `AND ${isCurrent}` : ""}`;
   } else {
-    const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
-    const secondPart = value ? `WHERE ${category} = '${value}'` : "";
-    const thirdPart =
-      isCurrent !== ""
-        ? secondPart !== ""
-          ? `AND ${isCurrent}`
-          : `WHERE ${isCurrent}`
-        : "";
-    queryLine = `SELECT ${firstPart} FROM tle.satellites_info_new ${secondPart} ${thirdPart}`;
+    if (category === "name" && value) {
+      queryLine = `SELECT COUNT(*) FROM tle.satellites_info_new WHERE ${category} LIKE '${value}%'`;
+    } else {
+      const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
+      const secondPart = value ? `WHERE ${category} = '${value}'` : "";
+      const thirdPart =
+        isCurrent !== ""
+          ? secondPart !== ""
+            ? `AND ${isCurrent}`
+            : `WHERE ${isCurrent}`
+          : "";
+      queryLine = `SELECT ${firstPart} FROM tle.satellites_info_new ${secondPart} ${thirdPart}`;
+    }
   }
   console.log(queryLine);
   return new Promise(function (resolve, reject) {

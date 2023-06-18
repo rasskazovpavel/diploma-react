@@ -4,7 +4,7 @@ import Header from "./components/Header/Header";
 import HistoryData from "./Pages/HistoryData/HistoryData";
 import CurrentSituation from "./Pages/CurrentSituation/CurrentSituation";
 export default function App() {
-  const [currPage, setCurrPage] = useState("0");
+  const [currPage, setCurrPage] = useState("2");
   return (
     <div className="App">
       <Header currPage={currPage} setCurrPage={setCurrPage} />
