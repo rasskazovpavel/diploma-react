@@ -17,7 +17,7 @@ import {
 import { PickDataDB } from "../../utils/PickDataDB";
 import { TableCodes } from "../../utils/TableCodes";
 import { ChartOptions } from "../../utils/ChartOptions";
-import { randColor, sortObj } from "../../utils/utilsFunctions";
+import { randColor, sortObj } from "../../utils/UtilsFunctions";
 import { AllColors } from "../../utils/AllColors";
 import cn from "classnames";
 Chart.register(CategoryScale);

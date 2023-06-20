@@ -11,6 +11,7 @@ export const filtersData = [
     type: "checkbox-scroll",
     id: "state",
     dropdown: "Выбор страны",
+    placeholder: "Введите страну",
   },
   {
     name: "Года",
@@ -18,6 +19,7 @@ export const filtersData = [
     type: "checkbox-scroll",
     id: "ldateyear",
     dropdown: "Выбор года",
+    placeholder: "Введите год",
   },
   {
     name: "Орбиты",
@@ -25,6 +27,7 @@ export const filtersData = [
     type: "checkbox-scroll",
     id: "oporbitoqu",
     dropdown: "Выбор орбиты",
+    placeholder: "Введите орбиту",
   },
   {
     name: "Статусы",
@@ -32,6 +35,7 @@ export const filtersData = [
     type: "checkbox-scroll",
     id: "status",
     dropdown: "Выбор статуса",
+    placeholder: "Введите статус",
   },
   {
     name: "Имена",
@@ -39,5 +43,6 @@ export const filtersData = [
     type: "checkbox-scroll",
     id: "name",
     dropdown: "Выбор имени",
+    placeholder: "Введите имя",
   },
 ];

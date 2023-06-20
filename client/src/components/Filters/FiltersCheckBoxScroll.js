@@ -3,7 +3,7 @@ import ReactIScroll from "react-iscroll";
 import iScroll from "iscroll";
 import { PickDataDB } from "../../utils/PickDataDB";
 import "./Filters.scss";
-import { sortObj } from "../../utils/utilsFunctions";
+import { sortObj } from "../../utils/UtilsFunctions";
 import { TableCodes } from "../../utils/TableCodes";
 import { TooltipCodes } from "../../utils/TooltipCodes";
 
@@ -13,7 +13,6 @@ const FiltersCheckBoxScroll = ({
   chosenData,
   order,
 }) => {
-  // отбираем из таблицы данные по нужной категории
   const [listOpen, setListOpen] = useState(false);
   const [data, setData] = useState({});
   const [renderedData, setRenderedData] = useState({});
@@ -57,7 +56,6 @@ const FiltersCheckBoxScroll = ({
     filterList(newInput, data);
   };
 
-  // обновляем выбранные данные
   const updateChosenData = (currData) => {
     const selectedData = currData.reduce((acc, line) => {
       if (line.isChecked) {
@@ -71,7 +69,6 @@ const FiltersCheckBoxScroll = ({
     setChosenData(newData);
   };
 
-  // обновляем фильтры категории
   const changeCheckboxStatus = (e) => {
     const currData = data.map((line) =>
       line.unit === e.target.value
@@ -91,7 +88,7 @@ const FiltersCheckBoxScroll = ({
 
   const clearCheckboxes = () => {
     const newData = [];
-    data.forEach((line, order) => {
+    data.forEach((line) => {
       newData.push({
         unit: line.unit,
         isChecked: false,
@@ -102,6 +99,7 @@ const FiltersCheckBoxScroll = ({
     updateChosenData(newData);
     setData(newData);
     setRenderedData(newData);
+    setInputQuery();
   };
 
   useEffect(() => {
@@ -147,7 +145,7 @@ const FiltersCheckBoxScroll = ({
                 <input
                   type="text"
                   className="filters_menu__scroll_filter"
-                  placeholder="Введите название"
+                  placeholder={filtersDataItem.placeholder}
                   onInput={(e) => inputHandler(e, order)}
                 />
                 {renderedData.length > 0 && (

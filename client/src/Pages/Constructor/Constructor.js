@@ -1,12 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import PieChart from "../../components/Charts/PieChart";
 import BarChart from "../../components/Charts/BarChart";
 import LineChart from "../../components/Charts/LineChart";
 import FiltersMenu from "../../components/FiltersMenu";
 import { TableCodes } from "../../utils/TableCodes";
-import { TooltipCodes } from "../../utils/TooltipCodes";
-import { randColor, sortObj } from "../../utils/utilsFunctions";
+import { randColor } from "../../utils/UtilsFunctions";
 import { AllColors } from "../../utils/AllColors";
+import { PickDataDB } from "../../utils/PickDataDB";
+import { ChartOptions } from "../../utils/ChartOptions";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import "./Constructor.scss";
@@ -20,8 +21,6 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
-import { PickDataDB } from "../../utils/PickDataDB";
-import { ChartOptions } from "../../utils/ChartOptions";
 Chart.register(CategoryScale);
 Chart.register(ArcElement);
 Chart.register(CategoryScale);
@@ -32,7 +31,6 @@ Chart.register(LineElement);
 
 const exportPDF = (e) => {
   const but = e.target;
-  // but.style.display = "none";
   let input = window.document.getElementsByClassName("chart-container")[0];
   let container = window.document.getElementsByClassName(
     "constructor__graphs"
@@ -40,8 +38,6 @@ const exportPDF = (e) => {
   html2canvas(input).then((canvas) => {
     const pdf = new jsPDF("l", "pt");
     const img = canvas.toDataURL("image/png");
-    // pdf.setFillColor(0, 0, 0, 1);
-    // pdf.rect(10, 10, 150, 160, "F");
     pdf.addImage(
       img,
       "png",
@@ -56,11 +52,9 @@ const exportPDF = (e) => {
 };
 
 export default function Constructor() {
-  const [chosenData, setChosenData] = useState({}); // выбранные чекбоксы
+  const [chosenData, setChosenData] = useState({});
   const [typeGraph, setTypeGraph] = useState();
-  // const [chosenGraphs, setChosenGraphs] = useState([]);
 
-  // текущие главная ось (абсцисса) и побочная (ордината)
   const [axes, setAxes] = useState({
     x: "",
     y: "",
@@ -68,7 +62,6 @@ export default function Constructor() {
 
   const [colors, setColors] = useState({});
 
-  // данные для графиков (ключи и значения)
   const [chartData, setChartData] = useState({});
 
   const handleStackedGraphs = () => {
@@ -76,12 +69,10 @@ export default function Constructor() {
     let keys = [];
     let firstIteration = true;
     let bgColor;
-    // добавляем график, если уже выбрали что-то на другой оси
     if (chosenData.secondary && chosenData.main)
       chosenData.secondary.forEach((chosenSecondary) => {
         let nums = [];
         const pickedData = [];
-        // для каждого ключа с побочной оси выбираем его данные
         const promises = chosenData.main.map((chosenMain) => {
           return PickDataDB(
             [axes.x, axes.y],
@@ -93,7 +84,6 @@ export default function Constructor() {
           });
         });
         Promise.all(promises).then(() => {
-          console.log(pickedData);
           const sortedPickedData = pickedData.sort((a, b) =>
             Object.keys(a)[0] > Object.keys(b)[0] ? 1 : -1
           );
@@ -101,7 +91,6 @@ export default function Constructor() {
             if (firstIteration) keys.push(Object.keys(elem)[0].split(",")[0]);
             nums.push(Object.values(elem)[0]);
           });
-          console.log(keys);
           firstIteration = false;
           if (AllColors[axes.y] && AllColors[axes.y][chosenSecondary])
             bgColor = AllColors[axes.y][chosenSecondary];
@@ -140,7 +129,6 @@ export default function Constructor() {
       });
   };
 
-  // собираем данные по выбранным чекбоксам в базе
   const collectChosenData = async () => {
     if (typeGraph === "barchart" || typeGraph === "linechart") {
       if (
@@ -191,7 +179,6 @@ export default function Constructor() {
             const colorsChart = Object.values(singleAxisData).map(
               (pair) => pair[1]
             );
-            // const newChartData = Object.assign({}, chartData);
             const mappedLabels = Object.keys(singleAxisData).map((label) =>
               TableCodes[axes.x] && TableCodes[axes.x][label]
                 ? TableCodes[axes.x][label]
@@ -211,7 +198,6 @@ export default function Constructor() {
             setChartData(newChartData);
           });
         } else {
-          // const newChartData = Object.assign({}, chartData);
           const newChartData = {
             labels: [],
             datasets: [
@@ -273,7 +259,6 @@ export default function Constructor() {
     }
   };
 
-  // вызываем сбор данных в конце
   useEffect(() => {
     collectChosenData();
   }, [chosenData, axes]);

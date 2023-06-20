@@ -1,5 +1,4 @@
 import "./style.css";
-import { useState, useEffect } from "react";
 
 import { filtersData } from "../utils/FiltersData";
 import FiltersCheckBoxScroll from "./Filters/FiltersCheckBoxScroll";
@@ -7,7 +6,6 @@ import FiltersAxes from "./Filters/FiltersAxes";
 import FiltersTypeGraph from "./Filters/FiltersTypeGraph";
 
 import "./FiltersMenu.scss";
-// const pdfConverter = require("jspdf");
 
 const FiltersMenu = ({
   setChosenData,

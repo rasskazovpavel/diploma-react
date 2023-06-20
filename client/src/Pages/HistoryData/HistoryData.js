@@ -4,7 +4,7 @@ import BarChart from "../../components/Charts/BarChart";
 import LineChart from "../../components/Charts/LineChart";
 import { TableCodes } from "../../utils/TableCodes";
 import { ChartOptions } from "../../utils/ChartOptions";
-import { randColor, sortObj } from "../../utils/utilsFunctions";
+import { randColor, sortObj } from "../../utils/UtilsFunctions";
 import { AllColors } from "../../utils/AllColors";
 import "./HistoryData.scss";
 import "../../App.css";
