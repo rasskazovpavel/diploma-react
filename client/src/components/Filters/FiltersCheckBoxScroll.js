@@ -121,6 +121,7 @@ const FiltersCheckBoxScroll = ({
       })
       .then((totalData) => {
         setData(totalData);
+        console.log(totalData);
         setRenderedData(totalData);
       });
   }, [filtersDataItem]);

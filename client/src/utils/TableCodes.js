@@ -8,7 +8,7 @@ export const TableCodes = {
     I: "Италия",
     UK: "Великобритания",
     F: "Франция",
-    "I-ESA": "Европейское космическое агенство",
+    "I-ESA": "Европейское космическое агентство",
     CA: "Канада",
     D: "Германия",
     AG: "Аргентина",
@@ -161,5 +161,12 @@ export const TableCodes = {
     GRP: "GRP",
     REL: "REL",
     TFR: "TFR",
+  },
+  type: {
+    CT: "CT",
+    DT: "DT",
+    PT: "PT",
+    RT: "RT",
+    ZT: "ZT",
   },
 };

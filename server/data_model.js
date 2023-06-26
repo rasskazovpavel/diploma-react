@@ -9,7 +9,7 @@ const pool = new Pool({
 
 const getData = () => {
   return new Promise(function (resolve, reject) {
-    pool.query("SELECT * FROM tle.satellites_info_new", (error, results) => {
+    pool.query("SELECT * FROM public.satellites_info_new", (error, results) => {
       if (error) {
         reject(error);
       }
@@ -33,13 +33,13 @@ const PickData = (category, value, current) => {
     categories.forEach((cat, index) => {
       conditions = conditions + `${cat} LIKE '${values[index]}%' AND `;
     });
-    queryLine = `SELECT COUNT(*) FROM tle.satellites_info_new WHERE ${conditions.slice(
+    queryLine = `SELECT COUNT(*) FROM public.satellites_info_new WHERE ${conditions.slice(
       0,
       -5
     )}${isCurrent !== "" ? `AND ${isCurrent}` : ""}`;
   } else {
     if (category === "name" && value) {
-      queryLine = `SELECT COUNT(*) FROM tle.satellites_info_new WHERE ${category} LIKE '${value}%'`;
+      queryLine = `SELECT COUNT(*) FROM public.satellites_info_new WHERE ${category} LIKE '${value}%'`;
     } else {
       const firstPart = value ? `COUNT(*)` : `DISTINCT ${category}`;
       const secondPart = value ? `WHERE ${category} = '${value}'` : "";
@@ -49,7 +49,7 @@ const PickData = (category, value, current) => {
             ? `AND ${isCurrent}`
             : `WHERE ${isCurrent}`
           : "";
-      queryLine = `SELECT ${firstPart} FROM tle.satellites_info_new ${secondPart} ${thirdPart}`;
+      queryLine = `SELECT ${firstPart} FROM public.satellites_info_new ${secondPart} ${thirdPart}`;
     }
   }
   console.log(queryLine);

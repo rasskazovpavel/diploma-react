@@ -45,4 +45,12 @@ export const filtersData = [
     dropdown: "Выбор имени",
     placeholder: "Введите имя",
   },
+  {
+    name: "Типы",
+    options: [],
+    type: "checkbox-scroll",
+    id: "type",
+    dropdown: "Выбор типа",
+    placeholder: "Введите тип",
+  },
 ];
